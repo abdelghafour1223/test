@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مهندس الأوامر الذكي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3b82f6; /* Tailwind blue-500 */
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #enhanced-prompt {
+            white-space: pre-wrap;
+            background-color: #1f2937; /* Tailwind gray-800 */
+            color: #d1d5db; /* Tailwind gray-300 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            direction: ltr;
+            text-align: left;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">مهندس الأوامر الذكي</h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">حوّل أفكارك البسيطة إلى أوامر احترافية خارقة!</p>
+        </header>
+
+        <main class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+            
+            <!-- Input Section -->
+            <div class="mb-6">
+                <label for="original-prompt" class="block mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">فكرتك أو طلبك البسيط</label>
+                <textarea id="original-prompt" rows="5" class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 bg-gray-50 dark:bg-gray-700 placeholder-gray-400 dark:placeholder-gray-500" placeholder="مثال: اكتب لي إيميل عن إطلاق منتج جديد..."></textarea>
+            </div>
+
+            <!-- Action Button -->
+            <div class="text-center mb-6">
+                <button id="rewrite-button" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 transition-transform transform hover:scale-105 duration-300 ease-in-out flex items-center justify-center mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <span>حسّن الأمر</span>
+                </button>
+            </div>
+
+            <!-- Output Section -->
+            <div>
+                <label for="enhanced-prompt" class="block mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">الأمر المحسَّن (جاهز للنسخ)</label>
+                <div class="relative">
+                    <div id="enhanced-prompt"></div>
+                    <!-- Copy Button -->
+                    <button id="copy-button" title="نسخ الأمر" class="absolute top-3 left-3 p-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-opacity opacity-0">
+                        <svg id="copy-icon-default" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <svg id="copy-icon-success" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </button>
+                    <div id="loader" class="absolute inset-0 flex items-center justify-center bg-gray-800/50 rounded-lg hidden">
+                        <div class="loader"></div>
+                    </div>
+                     <div id="placeholder-text" class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 p-4">
+                        ستظهر النتيجة الاحترافية هنا...
+                    </div>
+                </div>
+                 <div id="error-message" class="text-red-500 mt-2 text-center hidden"></div>
+            </div>
+
+        </main>
+        
+        <footer class="text-center mt-8 text-sm text-gray-500 dark:text-gray-400">
+            <p>تم التطوير بواسطة Gemini</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const rewriteButton = document.getElementById('rewrite-button');
+        const originalPromptInput = document.getElementById('original-prompt');
+        const enhancedPromptOutput = document.getElementById('enhanced-prompt');
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('error-message');
+        const placeholderText = document.getElementById('placeholder-text');
+        const copyButton = document.getElementById('copy-button');
+        const copyIconDefault = document.getElementById('copy-icon-default');
+        const copyIconSuccess = document.getElementById('copy-icon-success');
+
+        rewriteButton.addEventListener('click', async () => {
+            const originalPrompt = originalPromptInput.value.trim();
+            if (!originalPrompt) {
+                showError('الرجاء إدخال فكرة أو طلب بسيط أولاً.');
+                return;
+            }
+
+            // Reset UI
+            enhancedPromptOutput.textContent = '';
+            placeholderText.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            loader.classList.remove('hidden');
+            rewriteButton.disabled = true;
+            copyButton.classList.add('opacity-0');
+
+
+            try {
+                // The NEW, smarter "Prompt Engineer" system prompt
+                const rewriteSystemPrompt = `
+You are an advanced Prompt Engineering AI. Your primary function is to transform a user's simple idea into a sophisticated, highly-effective prompt without losing the original intent.
+
+Your process must follow these two steps:
+
+**Step 1: Analyze the Original Prompt**
+First, silently analyze the user's request to understand its core components. Identify:
+- **Core Goal:** What is the single most important thing the user wants to achieve?
+- **Implicit Intent:** What is the underlying need? (e.g., for "write a blog post", the intent is to create engaging content for a specific audience).
+- **Key Entities:** What are the main subjects or topics? (e.g., product name, concept, etc.).
+
+**Step 2: Construct the Enhanced Prompt**
+Based on your analysis, build a new, professional prompt. You must adhere strictly to the original goal. Structure the new prompt using the following elements, but only use the elements that directly serve the user's original intent.
+
+- **\`Role\`:** Assign a specific, expert persona to the AI. *Justification: This focuses the AI's knowledge base.*
+- **\`Context\`:** Provide the necessary background. *Justification: This gives the AI the 'why' behind the task.*
+- **\`Core Task\`:** Clearly state the main objective, rephrasing the user's request professionally. *This must directly reflect the user's original goal.*
+- **\`Key Details & Constraints\`:** Extract and list key information from the original prompt and add necessary constraints (tone, length, style). *Justification: This ensures the output is tailored and specific.*
+- **\`Output Structure\`:** Define the exact format for the response. *Justification: This makes the output predictable and easy to use.*
+
+---
+**Example Transformation:**
+
+* **User's Simple Idea:** "دير ليا شي منشور فيسبوك على القهوة"
+* **Your Enhanced Prompt:**
+    "**Role:** Social Media Marketing Specialist, expert in creating engaging content for lifestyle brands.
+
+    **Context:** The goal is to create a Facebook post for a coffee shop's page to increase engagement and remind followers about the quality of our coffee. The target audience is young professionals and students.
+
+    **Core Task:** Write a short, captivating Facebook post about the experience of drinking a high-quality cup of coffee in the morning.
+
+    **Key Details & Constraints:**
+    - The tone should be warm, inspiring, and slightly poetic.
+    - Mention the feeling of focus and energy that coffee provides.
+    - The post must include a question to encourage comments (e.g., "How do you take your morning coffee?").
+    - Keep the text under 50 words.
+    - Include a suggestion for 2-3 relevant hashtags (e.g., #MorningCoffee, #CoffeeLovers).
+
+    **Output Structure:** A single block of text for the Facebook post, followed by the suggested hashtags on a new line."
+---
+
+Now, apply this two-step process to the user's idea below. Only output the final "Enhanced Prompt".
+
+**User's Idea:** "${originalPrompt}"
+
+**Enhanced Prompt:**
+`;
+
+                let chatHistory = [{ role: "user", parts: [{ text: rewriteSystemPrompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const rewrittenText = result.candidates[0].content.parts[0].text;
+                    enhancedPromptOutput.textContent = rewrittenText.trim();
+                    copyButton.classList.remove('opacity-0'); // Show copy button
+                } else {
+                    throw new Error('لم يتم العثور على نتيجة في استجابة الـ API.');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError('حدث خطأ أثناء محاولة تحسين الأمر. الرجاء المحاولة مرة أخرى.');
+                placeholderText.classList.remove('hidden');
+            } finally {
+                loader.classList.add('hidden');
+                rewriteButton.disabled = false;
+            }
+        });
+
+        copyButton.addEventListener('click', () => {
+            const textToCopy = enhancedPromptOutput.textContent;
+            if (!textToCopy) return;
+
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                copyIconDefault.classList.add('hidden');
+                copyIconSuccess.classList.remove('hidden');
+                setTimeout(() => {
+                    copyIconDefault.classList.remove('hidden');
+                    copyIconSuccess.classList.add('hidden');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(textArea);
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
