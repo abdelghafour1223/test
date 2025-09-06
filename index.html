@@ -1,38 +1,171 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مرحبا بك</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-            text-align: center;
-            padding: 50px;
-            color: #333;
-        }
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        audio {
-            margin-top: 30px;
-            width: 80%;
-            max-width: 400px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تشغيل صوت تلقائي</title>
+  <style>
+    :root { --brand:#6c5ce7; --text:#222; --bg:#faf7ff; }
+    body {
+      margin:0; font-family:system-ui, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 10%, #ffffff, var(--bg));
+      color:var(--text); display:flex; min-height:100vh; align-items:center; justify-content:center;
+    }
+    .card {
+      width:min(640px, 92vw); background:#fff; border-radius:16px; padding:28px 22px;
+      box-shadow:0 12px 30px rgba(0,0,0,.08);
+      text-align:center;
+    }
+    h1 { margin:0 0 8px; font-size:1.8rem; }
+    p  { margin:0 0 18px; color:#555; }
+    .audio-wrap { margin-top:16px; }
+    audio { width:100%; height:40px; }
+    .toast {
+      position: fixed; inset:auto 16px 16px auto;
+      background:#111; color:#fff; padding:10px 14px; border-radius:10px; font-size:.95rem;
+      display:none; align-items:center; gap:10px; box-shadow:0 8px 20px rgba(0,0,0,.18);
+      opacity:.96;
+    }
+    .toast button {
+      background:var(--brand); color:#fff; border:0; border-radius:8px; padding:8px 12px; cursor:pointer;
+    }
+    .badge {
+      display:inline-block; background:rgba(108,92,231,.12); color:var(--brand);
+      padding:6px 10px; border-radius:999px; font-size:.85rem; margin-bottom:10px;
+    }
+    .hint { font-size:.9rem; color:#777; margin-top:8px; }
+  </style>
 </head>
 <body>
+  <div class="card">
+    <div class="badge">يتم تفعيل الصوت بذكاء حسب المتصفح</div>
+    <h1>أهلاً، استمتع بالمقطع الآن</h1>
+    <p>سنحاول تشغيل الصوت تلقائياً، وإن احتاج موافقة سنطلبها منك بلُطف.</p>
 
-    <h1>🎵 أهلاً بك في صفحتنا</h1>
-    <p>استمتع بالاستماع للمقطع الصوتي مباشرة</p>
+    <div class="audio-wrap">
+      <audio id="player" preload="auto" controls autoplay muted playsinline>
+        <source src="https://raw.githubusercontent.com/abdelghafour1223/audio/main/download%20(14).wav" type="audio/wav" />
+        متصفحك لا يدعم مشغل الصوت.
+      </audio>
+      <div class="hint">إذا لم تسمع شيئاً فوراً، اضغط في أي مكان لتفعيل الصوت.</div>
+    </div>
+  </div>
 
-    <!-- مشغل الصوت -->
-    <audio controls autoplay>
-        <source src="https://raw.githubusercontent.com/abdelghafour1223/audio/main/download%20(14).wav" type="audio/wav">
-        المتصفح الخاص بك لا يدعم تشغيل الصوت.
-    </audio>
+  <div id="toast" class="toast">
+    يحتاج الصوت لنقطة تفاعل بسيطة
+    <button id="enableBtn" type="button">تفعيل الصوت</button>
+  </div>
 
+  <script>
+    (function(){
+      const audio = document.getElementById('player');
+      const toast = document.getElementById('toast');
+      const enableBtn = document.getElementById('enableBtn');
+
+      let targetVolume = 0.9; // حجم نهائي
+      let fadeMs = 900;       // مدة الفيد-إن
+      let userActivated = false;
+      let triedAuto = false;
+
+      // محاولة تشغيل تلقائي مكتوم
+      function tryAutoplayMuted() {
+        if (triedAuto) return;
+        triedAuto = true;
+        audio.muted = true;
+        audio.volume = 0; // نضمن البداية بصفر
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          p.then(() => {
+            // اشتغل مكتوم… ننتظر أول تفاعل لرفع الصوت
+            showNudge();
+          }).catch(() => {
+            // رفض autoplay: نطلب تفاعل صريح
+            showToast();
+          });
+        } else {
+          // متصفحات قديمة: نظهر النَجدة
+          showNudge();
+        }
+      }
+
+      // إظهار تلميح صغير دون إزعاج
+      function showNudge() {
+        // نستخدم نفس التوست لكن بدون زر إذا أردت، هنا نخليه بالزر كحل شامل
+        showToast();
+      }
+
+      function showToast() {
+        toast.style.display = 'flex';
+      }
+      function hideToast() {
+        toast.style.display = 'none';
+      }
+
+      // تفعيل بالصوت بعد التفاعل: نرفع الـ mute ونطبّق فيد-إن
+      async function activateWithSound() {
+        if (userActivated) return;
+        userActivated = true;
+        hideToast();
+        try {
+          audio.muted = false;
+          await ensurePlaying();
+          await fadeTo(targetVolume, fadeMs);
+        } catch {
+          // إذا فشل، نخلي الزر ظاهر
+          showToast();
+        }
+      }
+
+      // نضمن أنه في حالة توقف، نشغله
+      async function ensurePlaying() {
+        if (audio.paused) {
+          await audio.play();
+        }
+      }
+
+      // فيد-إن سلس للصوت
+      function fadeTo(vTarget, ms) {
+        return new Promise(resolve => {
+          const start = performance.now();
+          const vStart = audio.volume;
+          const delta = vTarget - vStart;
+          function step(t) {
+            const k = Math.min(1, (t - start) / ms);
+            audio.volume = vStart + delta * k;
+            if (k < 1) requestAnimationFrame(step);
+            else resolve();
+          }
+          requestAnimationFrame(step);
+        });
+      }
+
+      // مستمعات أول تفاعل (ضغط/لمس/كيبورد)
+      const gestureEvents = ['click','touchstart','pointerdown','keydown'];
+      gestureEvents.forEach(evt => window.addEventListener(evt, activateWithSound, { once:true, passive:true }));
+
+      // إذا رجع المستخدم للتاب (بعض المتصفحات تسمح وقتها)
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !userActivated && audio.muted) {
+          // نحاول مرة أخرى تشغيل مكتوم
+          tryAutoplayMuted();
+        }
+      });
+
+      // إذا صار بإمكان التشغيل لاحقاً
+      audio.addEventListener('canplay', () => {
+        if (!triedAuto) tryAutoplayMuted();
+      });
+
+      // بداية: جرّب تشغيل مكتوم مباشرة
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        tryAutoplayMuted();
+      } else {
+        document.addEventListener('DOMContentLoaded', tryAutoplayMuted);
+      }
+
+      // زر "تفعيل الصوت"
+      enableBtn.addEventListener('click', activateWithSound);
+    })();
+  </script>
 </body>
 </html>
