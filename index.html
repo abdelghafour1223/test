@@ -1,171 +1,681 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>تشغيل صوت تلقائي</title>
-  <style>
-    :root { --brand:#6c5ce7; --text:#222; --bg:#faf7ff; }
-    body {
-      margin:0; font-family:system-ui, Arial, sans-serif;
-      background: radial-gradient(1200px 800px at 20% 10%, #ffffff, var(--bg));
-      color:var(--text); display:flex; min-height:100vh; align-items:center; justify-content:center;
-    }
-    .card {
-      width:min(640px, 92vw); background:#fff; border-radius:16px; padding:28px 22px;
-      box-shadow:0 12px 30px rgba(0,0,0,.08);
-      text-align:center;
-    }
-    h1 { margin:0 0 8px; font-size:1.8rem; }
-    p  { margin:0 0 18px; color:#555; }
-    .audio-wrap { margin-top:16px; }
-    audio { width:100%; height:40px; }
-    .toast {
-      position: fixed; inset:auto 16px 16px auto;
-      background:#111; color:#fff; padding:10px 14px; border-radius:10px; font-size:.95rem;
-      display:none; align-items:center; gap:10px; box-shadow:0 8px 20px rgba(0,0,0,.18);
-      opacity:.96;
-    }
-    .toast button {
-      background:var(--brand); color:#fff; border:0; border-radius:8px; padding:8px 12px; cursor:pointer;
-    }
-    .badge {
-      display:inline-block; background:rgba(108,92,231,.12); color:var(--brand);
-      padding:6px 10px; border-radius:999px; font-size:.85rem; margin-bottom:10px;
-    }
-    .hint { font-size:.9rem; color:#777; margin-top:8px; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Ultimate Freedom Code - Build Your Empire</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Combined fonts from both files -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Config from the first file (professional theme) -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'primary-navy': '#1e3a5f',
+              'primary-teal': '#4a9b9b',
+              'accent-coral': '#ff6b6b',
+              'accent-gold': '#ffd93d',
+              'bg-cream': '#faf8f3',
+              'bg-light': '#ffffff',
+              'text-dark': '#2c3e50',
+              'text-medium': '#5a6c7d',
+              'accent-purple': '#8b5cf6',
+            },
+            fontFamily: {
+              'montserrat': ['"Montserrat"', 'sans-serif'],
+              'merriweather': ['"Merriweather"', 'serif'],
+               // Added fonts from the second file for potential use
+              'playfair': ['"Playfair Display"', 'serif'],
+              'roboto': ['"Roboto"', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- React & Babel for JSX Transpilation -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 </head>
 <body>
-  <div class="card">
-    <div class="badge">يتم تفعيل الصوت بذكاء حسب المتصفح</div>
-    <h1>أهلاً، استمتع بالمقطع الآن</h1>
-    <p>سنحاول تشغيل الصوت تلقائياً، وإن احتاج موافقة سنطلبها منك بلُطف.</p>
+    <div id="root"></div>
 
-    <div class="audio-wrap">
-      <audio id="player" preload="auto" controls autoplay muted playsinline>
-        <source src="https://raw.githubusercontent.com/abdelghafour1223/audio/main/download%20(14).wav" type="audio/wav" />
-        متصفحك لا يدعم مشغل الصوت.
-      </audio>
-      <div class="hint">إذا لم تسمع شيئاً فوراً، اضغط في أي مكان لتفعيل الصوت.</div>
-    </div>
-  </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-  <div id="toast" class="toast">
-    يحتاج الصوت لنقطة تفاعل بسيطة
-    <button id="enableBtn" type="button">تفعيل الصوت</button>
-  </div>
+        // --- COMBINED DATA CONSTANTS ---
 
-  <script>
-    (function(){
-      const audio = document.getElementById('player');
-      const toast = document.getElementById('toast');
-      const enableBtn = document.getElementById('enableBtn');
+        const painPoints = [
+            "You know you're capable of more, but the traditional career path feels like a ceiling, not a ladder.",
+            "You're watching others build empires online while you're stuck in meetings that could have been emails.",
+            "You're sick of trading precious time with your kids for a paycheck that barely covers the bills.",
+            "You have amazing ideas, but the thought of \"tech stuff\" and \"building a website\" is paralyzing.",
+            "You crave financial independence but need a proven system, not another risky venture.",
+            "You see other moms succeeding online and a voice in your head whispers, \"Why not me?\"",
+        ];
 
-      let targetVolume = 0.9; // حجم نهائي
-      let fadeMs = 900;       // مدة الفيد-إن
-      let userActivated = false;
-      let triedAuto = false;
+        const testimonialsData = [
+            { text: "As a former Fortune 500 executive, I was skeptical. But this system is brilliant. I replaced my <strong>six-figure salary in 4 months</strong> and finally have the autonomy I craved.", author: "Alexandra Chen", location: "Tech Executive turned CEO, San Francisco", avatar: "https://i.pravatar.cc/100?u=alex_chen_sf", badge: "Verified Buyer" },
+            { text: "My Etsy shop made $78 in its first month. Then I used The Etsy Goldmine plan. Last month, it made <strong>$1,940 in passive income</strong>. I still can't believe it. My life has completely changed.", author: "Emily R.", location: "Former Teacher, Texas", avatar: "https://i.pravatar.cc/100?u=emily_rose_texas", badge: "Success Story" },
+            { text: "I launched my consultancy while on maternity leave. Six months later, I'm billing <strong>$5K+ per project</strong> and choosing my clients. The freedom is intoxicating.", author: "Sophia Martinez", location: "Former CFO, Miami", avatar: "https://i.pravatar.cc/100?u=sophia_martinez_miami", badge: "Success Story" },
+            { text: "The AI toolkit alone is worth 10x the investment. I create content that converts in minutes, not hours. My ROI was <strong>positive within 2 weeks</strong>.", author: "Jennifer Park", location: "Marketing Director & Entrepreneur, Seattle", avatar: "https://i.pravatar.cc/100?u=jennifer_park_seattle", badge: "Verified Buyer" },
+            { text: "The Social Media plan is pure genius. I'm not even a 'tech' person but the 3-Post system is so easy. I now get paid <strong>$1,500/month</strong> to post on Facebook for a local bakery. This is the freedom I've been praying for.", author: "Jessica P.", location: "Designer & Mom, Florida", avatar: "https://i.pravatar.cc/100?u=jess_perez_florida", badge: "Rising Star" },
+            { text: "The mindset module transformed everything. I went from undercharging to commanding <strong>premium rates</strong>. My confidence and bank account have never been better.", author: "Victoria Hughes", location: "Brand Strategist, Chicago", avatar: "https://i.pravatar.cc/100?u=victoria_hughes_chicago", badge: "Top Performer" },
+        ];
 
-      // محاولة تشغيل تلقائي مكتوم
-      function tryAutoplayMuted() {
-        if (triedAuto) return;
-        triedAuto = true;
-        audio.muted = true;
-        audio.volume = 0; // نضمن البداية بصفر
-        const p = audio.play();
-        if (p && typeof p.then === 'function') {
-          p.then(() => {
-            // اشتغل مكتوم… ننتظر أول تفاعل لرفع الصوت
-            showNudge();
-          }).catch(() => {
-            // رفض autoplay: نطلب تفاعل صريح
-            showToast();
-          });
-        } else {
-          // متصفحات قديمة: نظهر النَجدة
-          showNudge();
+        const bonusData = [
+            { title: "Executive Mindset Accelerator", image: "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?q=80&w=1469&auto=format&fit=crop", description: "Master the psychology of high-ticket selling and position yourself as the expert you are. Includes negotiation scripts used by 7-figure consultants.", value: 297 },
+            { title: "AI-Powered Business Suite", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1470&auto=format&fit=crop", description: "Complete automation templates and AI prompts that eliminate 80% of busy work. Build funnels, create content, and manage clients in a fraction of the time.", value: 497 },
+            { title: "Private Network Access", image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1470&auto=format&fit=crop", description: "Join our exclusive community of ambitious women building empires. Weekly masterminds, deal flow, and partnerships that accelerate your growth.", value: 997 },
+             { title: "The Mompreneur Mindset", image: "https://images.unsplash.com/photo-1509475826633-fed577a2c71b?q=80&w=1287&auto=format&fit=crop", description: "Learn to crush self-doubt, destroy imposter syndrome, and build the bulletproof confidence of a 6-figure CEO. Success is 80% mindset.", value: 70 },
+        ];
+
+        const faqData = [
+            { question: "I have a demanding career. Is this realistic for someone with limited time?", answer: "Absolutely. This system was designed for high-achievers. Every strategy is optimized for maximum impact with minimum time. Most members start with just 5-7 hours per week." },
+            { question: "But I have zero business/marketing/tech experience. Is this really for me?", answer: "This was created for you. The plans are so step-by-step that your only job is to follow them. If you can follow a recipe to bake a cake, you can follow this to build a business." },
+            { question: "How is this different from other online business programs?", answer: "We don't teach generic tactics. This is a sophisticated framework used by consultants billing $500+/hour, made simple and actionable for everyone." },
+            { question: "What if it doesn't work for me? What's the guarantee?", answer: "There is no catch. If you're not thrilled, you get your money back within 30 days. Period. We are so confident this will change your life that we're willing to take on all the risk." },
+            { question: "Is this a one-time payment? Are there hidden fees?", answer: "It's a one-time payment for lifetime access to all the materials and future updates. No recurring fees, no upsells, no nonsense." },
+        ];
+        
+        const statData = [
+            { number: "87%", label: "Success Rate", sublabel: "of members profitable within 90 days" },
+            { number: "$4.2M", label: "Generated", sublabel: "by our community last year" },
+            { number: "2,847", label: "Women", sublabel: "building freedom-based businesses" },
+            { number: "15hrs", label: "Average", sublabel: "work week for established members" },
+        ];
+        
+        const socialBuzzData = [
+          { platform: 'twitter', handle: '@jenna_makes_magic', comment: "Seriously, the Etsy Goldmine part of the Freedom Code is a GAME CHANGER. My shop's views are up 300% in a week. Mind. Blown. 🤯 #mombiz" },
+          { platform: 'instagram', handle: '@busy_mom_hustle', comment: "Just landed my first VA client using the scripts from The Freedom Code! I'm officially getting paid to work from my couch in my PJs. This is the dream, people!" },
+          { platform: 'facebook', handle: 'Maria Rodriguez', comment: "I was so scared of the 'tech' side of things, but the Social Media Domination plan made it so simple. I'm actually having FUN managing accounts for local businesses. Thank you for this!" },
+          { platform: 'twitter', handle: '@side_hustle_sara', comment: "If you're a mom on the fence about starting something, just get The Freedom Code. Best investment I've ever made in my business. No fluff, all action." },
+        ];
+
+        // --- HELPER COMPONENTS & HOOKS ---
+
+        const useAnimateOnScroll = (options) => {
+            const ref = useRef(null);
+            const [isVisible, setIsVisible] = useState(false);
+            useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        setIsVisible(true);
+                        if (ref.current) {
+                            observer.unobserve(ref.current);
+                        }
+                    }
+                }, { threshold: 0.1, ...options });
+                const currentRef = ref.current;
+                if (currentRef) {
+                    observer.observe(currentRef);
+                }
+                return () => {
+                    if (currentRef) {
+                        observer.unobserve(currentRef);
+                    }
+                };
+            }, [ref, options]);
+            return [ref, isVisible];
+        };
+
+        const AnimateOnScroll = ({ children, className, stagger = 0 }) => {
+            const [ref, isVisible] = useAnimateOnScroll();
+            return (
+                <div
+                    ref={ref}
+                    className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
+                    style={{ transitionDelay: `${stagger}ms` }}
+                >
+                    {children}
+                </div>
+            );
+        };
+
+        const CountdownTimer = () => {
+            const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    const now = new Date();
+                    const endOfDay = new Date(now);
+                    endOfDay.setHours(23, 59, 59, 999);
+                    const timeDifference = endOfDay.getTime() - now.getTime();
+                    if (timeDifference > 0) {
+                        const hours = Math.floor((timeDifference / (1000 * 60 * 60)) % 24);
+                        const minutes = Math.floor((timeDifference / 1000 / 60) % 60);
+                        const seconds = Math.floor((timeDifference / 1000) % 60);
+                        setTimeLeft({
+                            hours: hours.toString().padStart(2, '0'),
+                            minutes: minutes.toString().padStart(2, '0'),
+                            seconds: seconds.toString().padStart(2, '0'),
+                        });
+                    }
+                }, 1000);
+                return () => clearInterval(timer);
+            }, []);
+            return (
+                <AnimateOnScroll>
+                    <div className="text-lg md:text-xl font-semibold text-primary-navy bg-gradient-to-r from-accent-gold/20 to-accent-coral/20 p-3 rounded-full my-5 mx-auto max-w-xs md:max-w-sm shadow-md backdrop-blur-sm">
+                        <span className="text-sm uppercase tracking-wider block mb-1">Limited Enrollment Closes In</span>
+                        {timeLeft.hours}h : {timeLeft.minutes}m : {timeLeft.seconds}s
+                    </div>
+                </AnimateOnScroll>
+            );
+        };
+
+        const CtaButton = ({ children, href, className, variant = "primary" }) => {
+            const baseClasses = "block w-full max-w-md mx-auto md:inline-block md:w-auto text-lg md:text-xl font-semibold py-4 md:py-5 px-8 md:px-12 rounded-full shadow-lg hover:-translate-y-1 hover:shadow-2xl active:scale-95 transition-all duration-300 ease-in-out text-center";
+            const variants = {
+                primary: "bg-gradient-to-r from-accent-coral to-accent-purple text-white",
+                secondary: "bg-primary-navy text-white",
+                outline: "border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white"
+            };
+            return (
+                <a href={href} className={`${baseClasses} ${variants[variant]} ${className}`}>
+                    {children}
+                </a>
+            );
+        };
+        
+        // --- SECTION COMPONENTS ---
+
+        const HeroSection = () => (
+            <section className="hero-section bg-gradient-to-b from-bg-light to-bg-cream pt-12 pb-16 text-center relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5">
+                    <div className="absolute top-20 left-10 w-72 h-72 bg-accent-coral rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent-purple rounded-full blur-3xl"></div>
+                </div>
+                <div className="container max-w-7xl mx-auto px-5 relative z-10">
+                    <AnimateOnScroll>
+                        <div className="inline-block bg-gradient-to-r from-accent-coral/10 to-accent-purple/10 text-primary-navy px-6 py-2 rounded-full text-sm font-semibold uppercase tracking-wider mb-6">
+                            Join 2,847+ Women Building Empires
+                        </div>
+                    </AnimateOnScroll>
+                    <AnimateOnScroll stagger={100}>
+                        <h1 className="font-merriweather text-4xl md:text-6xl lg:text-7xl font-bold text-primary-navy leading-tight">
+                            The Elite Blueprint for<br/>
+                            <span className="bg-gradient-to-r from-accent-coral to-accent-purple bg-clip-text text-transparent">Location-Independent Wealth</span>
+                        </h1>
+                    </AnimateOnScroll>
+                    <AnimateOnScroll stagger={200}>
+                        <p className="text-xl md:text-2xl max-w-4xl mx-auto mt-6 text-text-medium font-light">
+                             Discover the sophisticated 3-part system for building a real, profitable online business from home—even if you have zero experience, limited time, and you're terrified of technology.
+                        </p>
+                    </AnimateOnScroll>
+                    <AnimateOnScroll stagger={300}>
+                        <div className="mt-8 space-y-4">
+                            <CtaButton href="#offer">Start Your Empire Today →</CtaButton>
+                            <p className="text-sm text-text-medium">
+                                <span className="font-semibold">⚡ 400+ spots claimed today</span> • Only 47 remaining at this price
+                            </p>
+                        </div>
+                    </AnimateOnScroll>
+                    <CountdownTimer />
+                </div>
+            </section>
+        );
+
+        const AsSeenOnSection = () => (
+            <div className="as-seen-on bg-bg-cream py-6 text-center">
+                <div className="container max-w-7xl mx-auto px-5">
+                    <AnimateOnScroll>
+                        <h5 className="text-sm uppercase tracking-widest text-text-medium font-bold mb-5">Moms Using The Freedom Code Have Been Featured In:</h5>
+                        <div className="flex justify-center items-center gap-6 md:gap-10 flex-wrap">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Forbes_logo.svg/2560px-Forbes_logo.svg.png" alt="Forbes Logo" className="max-h-6 md:max-h-8 grayscale opacity-70 transition-all duration-300 hover:grayscale-0 hover:opacity-100"/>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Business_Insider_logo.svg/1200px-Business_Insider_logo.svg.png" alt="Business Insider Logo" className="max-h-6 md:max-h-8 grayscale opacity-70 transition-all duration-300 hover:grayscale-0 hover:opacity-100"/>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Parents_Magazine_logo.png" alt="Parents Magazine Logo" className="max-h-6 md:max-h-8 grayscale opacity-70 transition-all duration-300 hover:grayscale-0 hover:opacity-100"/>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Entrepreneur_Logo.svg/1200px-Entrepreneur_Logo.svg.png" alt="Entrepreneur Logo" className="max-h-6 md:max-h-8 grayscale opacity-70 transition-all duration-300 hover:grayscale-0 hover:opacity-100"/>
+                        </div>
+                    </AnimateOnScroll>
+                </div>
+            </div>
+        );
+
+        const StatsSection = () => (
+            <section className="stats-section bg-primary-navy py-16">
+                <div className="container max-w-7xl mx-auto px-5">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        {statData.map((stat, index) => (
+                            <AnimateOnScroll key={index} stagger={index * 100}>
+                                <div className="text-center">
+                                    <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent-gold to-accent-coral bg-clip-text text-transparent">
+                                        {stat.number}
+                                    </div>
+                                    <div className="text-white font-semibold mt-2">{stat.label}</div>
+                                    <div className="text-white/70 text-sm">{stat.sublabel}</div>
+                                </div>
+                            </AnimateOnScroll>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+
+        const PainPointsSection = () => (
+            <section className="pain-points-section bg-bg-cream py-20">
+                <div className="container max-w-7xl mx-auto px-5">
+                    <AnimateOnScroll>
+                        <h2 className="font-merriweather text-3xl md:text-5xl text-center font-bold text-primary-navy">
+                            You're Not Looking for Another Side Hustle
+                        </h2>
+                        <p className="text-center mt-4 text-text-medium text-lg">
+                            You're looking for a complete transformation. If you're nodding your head to any of these, you're in the right place:
+                        </p>
+                    </AnimateOnScroll>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl mx-auto mt-12">
+                        {painPoints.map((point, index) => (
+                            <AnimateOnScroll key={index} stagger={index * 50}>
+                                <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 flex items-start">
+                                    <span className="text-accent-coral mr-4 mt-1">
+                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                        </svg>
+                                    </span>
+                                    <p className="text-text-dark">{point}</p>
+                                </div>
+                            </AnimateOnScroll>
+                        ))}
+                    </div>
+                    <AnimateOnScroll className="text-center mt-12">
+                        <p className="text-xl text-primary-navy font-semibold">
+                            It's time to stop settling and start building the empire you deserve.
+                        </p>
+                    </AnimateOnScroll>
+                </div>
+            </section>
+        );
+
+        const SolutionSection = () => (
+            <section className="solution-section bg-gradient-to-b from-bg-light to-bg-cream py-20">
+                <div className="container max-w-7xl mx-auto px-5 text-center">
+                    <AnimateOnScroll>
+                        <h2 className="font-merriweather text-3xl md:text-5xl font-bold text-primary-navy mb-4">
+                            Your Complete Business-Building System
+                        </h2>
+                        <h3 className="text-2xl md:text-3xl text-accent-coral font-bold">The Freedom Code™</h3>
+                        <p className="max-w-4xl mx-auto mt-6 mb-10 text-text-medium text-lg">
+                            Three comprehensive frameworks that eliminate guesswork and accelerate your path to profitability. 
+                            Each module is a complete business model, refined by hundreds of successful implementations.
+                        </p>
+                    </AnimateOnScroll>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+                        {[
+                            { title: "Framework 1: Premium Service Agency", icon: "🚀", points: ["Land $2,500+ retainer clients using our proven outreach templates", "Position yourself as a strategic partner, not a freelancer", "Scale to $10K/month without hiring a team"], color: "from-purple-500 to-indigo-600" },
+                            { title: "Framework 2: Social Media Domination", icon: "📱", points: ["Turn your expertise into $5K+ monthly recurring revenue", "Automate 80% of deliverables with our AI systems", "Build a waitlist of premium clients"], color: "from-pink-500 to-rose-600" },
+                            { title: "Framework 3: The Etsy Goldmine", icon: "💎", points: ["Create passive income streams that scale infinitely", "Master platform algorithms for consistent visibility", "Build a brand that commands premium prices"], color: "from-amber-500 to-orange-600" }
+                        ].map((framework, index) => (
+                            <AnimateOnScroll key={index} stagger={index * 100}>
+                                <div className="bg-white rounded-2xl shadow-xl p-8 hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden h-full">
+                                    <div className={`absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${framework.color}`}></div>
+                                    <div className="text-5xl mb-4">{framework.icon}</div>
+                                    <h3 className="text-xl font-bold text-primary-navy mb-4">{framework.title}</h3>
+                                    <ul className="text-left space-y-3 text-text-medium">
+                                        {framework.points.map((point, i) => (
+                                            <li key={i} className="flex items-start">
+                                                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                <span>{point}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </AnimateOnScroll>
+                        ))}
+                    </div>
+                    <AnimateOnScroll className="mt-12">
+                        <CtaButton href="#offer">Unlock All Frameworks Now →</CtaButton>
+                    </AnimateOnScroll>
+                </div>
+            </section>
+        );
+        
+        const CreatorSection = () => (
+            <section className="creator-section bg-bg-cream py-12 md:py-20">
+                <div className="container max-w-5xl mx-auto px-5 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                    <AnimateOnScroll className="flex-shrink-0">
+                        <img src="https://pbs.twimg.com/profile_images/1962156801064865793/W4KMBqHf_400x400.jpg" alt="Creator of the bundle" className="w-40 h-40 md:w-52 md:h-52 rounded-full object-cover shadow-lg ring-4 ring-bg-light ring-offset-4 ring-offset-accent-coral transition-transform duration-300 ease-in-out hover:scale-105" />
+                    </AnimateOnScroll>
+                    <AnimateOnScroll stagger={100} className="text-center md:text-left">
+                        <h3 className="font-merriweather text-2xl md:text-3xl text-accent-coral font-bold">From Rock Bottom to a Life By Design</h3>
+                        <p className="mt-4 text-text-medium">A few years ago, I was you. Drowning in debt, surviving on caffeine, and feeling immense guilt every time I dropped my kids at daycare. I was a "good employee," but a burned-out mom. I hit a breaking point where I knew something had to change, or I'd lose myself completely.</p>
+                        <p className="mt-4 text-text-medium">I dove headfirst into the online world, failing spectacularly at first. But I didn't quit. I tested everything, found what worked, and pieced together these repeatable systems. Today, I run a six-figure business from my laptop, in my PJs. I never miss a school event. This bundle contains the exact secrets I used to escape the rat race. I'm handing you the keys because I know you deserve this freedom, too.</p>
+                    </AnimateOnScroll>
+                </div>
+            </section>
+        );
+
+        const TestimonialsSection = () => (
+            <section className="testimonials-section bg-bg-light py-20">
+                <div className="container max-w-7xl mx-auto px-5">
+                    <AnimateOnScroll>
+                        <h2 className="font-merriweather text-3xl md:text-5xl text-center font-bold text-primary-navy">
+                            Success Stories From Our Community
+                        </h2>
+                        <p className="text-center mt-4 text-text-medium text-lg">
+                            Real results from women who took action and transformed their lives
+                        </p>
+                    </AnimateOnScroll>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+                        {testimonialsData.map((testimonial, index) => (
+                            <AnimateOnScroll key={index} stagger={index * 100}>
+                                <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-shadow duration-300 flex flex-col h-full">
+                                    <div className="flex items-center mb-4">
+                                        <img src={testimonial.avatar} alt={testimonial.author} className="w-12 h-12 rounded-full mr-3" />
+                                        <div className="flex-grow">
+                                            <div className="font-semibold text-primary-navy">{testimonial.author}</div>
+                                            <div className="text-text-medium text-sm">{testimonial.location}</div>
+                                        </div>
+                                        <span className="bg-gradient-to-r from-accent-coral to-accent-purple text-white text-xs px-3 py-1 rounded-full">
+                                            {testimonial.badge}
+                                        </span>
+                                    </div>
+                                    <div className="flex mb-3">
+                                        {[...Array(5)].map((_, i) => (
+                                            <svg key={i} className="w-5 h-5 text-accent-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                        ))}
+                                    </div>
+                                    <p className="text-text-dark flex-grow" dangerouslySetInnerHTML={{ __html: `"${testimonial.text}"` }} />
+                                </div>
+                            </AnimateOnScroll>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+        
+        const SocialBuzzSection = () => {
+             const PlatformIcon = ({ platform }) => {
+                const icons = {
+                    twitter: ( <svg className="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg> ),
+                    instagram: ( <svg className="w-6 h-6 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.626c-3.141 0-3.513.011-4.742.068-2.695.123-3.993 1.42-4.116 4.116-.057 1.229-.068 1.598-.068 4.742s.011 3.513.068 4.742c.123 2.695 1.42 3.993 4.116 4.116 1.229.057 1.598.068 4.742.068s3.513-.011 4.742-.068c2.695-.123 3.993-1.42 4.116-4.116.057-1.229.068-1.598.068-4.742s-.011-3.513-.068-4.742c-.123-2.695-1.42-3.993-4.116-4.116-1.229-.057-1.598-.068-4.742-.068zm0 5.48c-1.928 0-3.481 1.553-3.481 3.48s1.553 3.481 3.481 3.481 3.481-1.553 3.481-3.48S13.928 9.269 12 9.269zm0 5.681c-1.213 0-2.191-.978-2.191-2.191S10.787 9.96 12 9.96s2.191.978 2.191 2.191-.978 2.191-2.191 2.191zm4.868-6.19c-.961 0-1.739-.778-1.739-1.739s.778-1.739 1.739-1.739 1.739.778 1.739 1.739-.778 1.739-1.739 1.739z" /></svg> ),
+                    facebook: ( <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" /></svg> )
+                };
+                return icons[platform] || null;
+            };
+
+            return (
+                <section className="social-buzz-section bg-bg-cream py-12 md:py-20">
+                    <div className="container max-w-7xl mx-auto px-5">
+                        <AnimateOnScroll>
+                            <h2 className="font-merriweather text-3xl md:text-5xl text-center font-bold text-primary-navy">The Buzz on Social Media</h2>
+                            <p className="text-center mt-4 text-text-medium text-lg">Real moms, real-time results.</p>
+                        </AnimateOnScroll>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
+                            {socialBuzzData.map((buzz, index) => (
+                                <AnimateOnScroll key={index} stagger={index * 100}>
+                                    <div className="social-card bg-white p-5 rounded-lg shadow-md flex flex-col h-full border border-gray-100 transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg">
+                                        <div className="flex items-center mb-3">
+                                            <PlatformIcon platform={buzz.platform} />
+                                            <span className="font-bold text-text-dark ml-2">{buzz.handle}</span>
+                                        </div>
+                                        <p className="text-text-medium text-sm flex-grow">"{buzz.comment}"</p>
+                                    </div>
+                                </AnimateOnScroll>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const BonusSection = () => (
+            <section className="bonus-section bg-gradient-to-b from-primary-navy to-primary-teal py-20 text-white">
+                <div className="container max-w-7xl mx-auto px-5">
+                    <AnimateOnScroll>
+                        <h2 className="font-merriweather text-3xl md:text-5xl text-center font-bold mb-4">
+                            Your Fast-Action Bonuses
+                        </h2>
+                        <p className="text-center text-white/90 text-lg max-w-3xl mx-auto">
+                            Act now and receive these exclusive additions to accelerate your success
+                        </p>
+                    </AnimateOnScroll>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+                        {bonusData.map((bonus, index) => (
+                            <AnimateOnScroll key={index} stagger={index * 100}>
+                                <div className="bg-white/10 backdrop-blur-lg rounded-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 flex flex-col h-full">
+                                    <div className="relative h-48">
+                                        <img src={bonus.image} alt={bonus.title} className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/90 to-transparent flex items-end p-6">
+                                            <h3 className="text-xl font-bold text-white">{bonus.title}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="p-6 flex flex-col flex-grow">
+                                        <p className="text-white/90 mb-4 flex-grow">{bonus.description}</p>
+                                        <div className="flex justify-between items-center mt-auto">
+                                            <span className="text-accent-gold font-bold">Value: ${bonus.value}</span>
+                                            <span className="bg-green-500 text-white text-xs px-3 py-1 rounded-full">FREE TODAY</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </AnimateOnScroll>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+
+        const OfferSection = () => (
+            <section id="offer" className="offer-section bg-bg-cream py-20 text-center">
+                <div className="container max-w-7xl mx-auto px-5">
+                    <AnimateOnScroll>
+                        <h2 className="font-merriweather text-3xl md:text-5xl font-bold text-primary-navy">
+                            Your Investment in Independence
+                        </h2>
+                        <p className="mt-4 mb-8 text-text-medium text-lg">
+                            Everything you need to build, launch, and scale your empire.
+                        </p>
+                    </AnimateOnScroll>
+                    <AnimateOnScroll stagger={100}>
+                        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-4xl mx-auto">
+                            <div className="grid md:grid-cols-2 gap-8 text-left mb-8">
+                                <div>
+                                    <h3 className="text-xl font-bold text-primary-navy mb-4">Core Frameworks</h3>
+                                    <ul className="space-y-3 text-text-medium">
+                                        <li className="flex items-center"><svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> Premium Service Agency ($497 Value)</li>
+                                        <li className="flex items-center"><svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> Social Media Domination ($497 Value)</li>
+                                        <li className="flex items-center"><svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> The Etsy Goldmine ($397 Value)</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-primary-navy mb-4">Premium Bonuses</h3>
+                                    <ul className="space-y-3 text-text-medium">
+                                       <li className="flex items-center"><svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> Executive Mindset Accelerator ($297 Value)</li>
+                                        <li className="flex items-center"><svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> AI-Powered Business Suite ($497 Value)</li>
+                                        <li className="flex items-center"><svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> Private Network Access ($997 Value)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="border-t border-gray-200 pt-8">
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="text-text-medium">Total Value</span>
+                                    <span className="text-2xl line-through text-gray-400">$3,252</span>
+                                </div>
+                                <div className="bg-gradient-to-r from-accent-coral/10 to-accent-purple/10 rounded-xl p-6">
+                                    <p className="text-primary-navy font-semibold mb-2">Limited-Time Investment</p>
+                                    <div className="text-5xl md:text-6xl font-bold text-primary-navy mb-4">$197</div>
+                                    <p className="text-text-medium text-sm">One-time payment • Lifetime access • Risk-free guarantee</p>
+                                </div>
+                            </div>
+                        </div>
+                    </AnimateOnScroll>
+                    <AnimateOnScroll stagger={200} className="mt-8">
+                        <CtaButton href="#checkout">Secure Your Access Now →</CtaButton>
+                        <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                            <div className="flex items-center"><svg className="w-6 h-6 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg><span className="text-text-medium">30-Day Money-Back Guarantee</span></div>
+                            <div className="flex items-center"><svg className="w-6 h-6 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" /></svg><span className="text-text-medium">Secure Checkout</span></div>
+                            <div className="flex items-center"><svg className="w-6 h-6 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" /></svg><span className="text-text-medium">Instant Access</span></div>
+                        </div>
+                    </AnimateOnScroll>
+                </div>
+            </section>
+        );
+
+        const FaqSection = () => {
+            const [openIndex, setOpenIndex] = useState(null);
+            return (
+                <section className="faq-section bg-bg-light py-20">
+                    <div className="container max-w-4xl mx-auto px-5">
+                        <AnimateOnScroll>
+                            <h2 className="font-merriweather text-3xl md:text-5xl text-center font-bold text-primary-navy">
+                                Frequently Asked Questions
+                            </h2>
+                        </AnimateOnScroll>
+                        <div className="mt-12 space-y-4">
+                            {faqData.map((item, index) => (
+                                <AnimateOnScroll key={index} stagger={index * 50}>
+                                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                        <button onClick={() => setOpenIndex(openIndex === index ? null : index)} className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-gray-50 transition-colors duration-200">
+                                            <h3 className="text-lg font-semibold text-primary-navy pr-4">{item.question}</h3>
+                                            <svg className={`w-5 h-5 text-primary-teal transition-transform duration-200 ${openIndex === index ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                                        </button>
+                                        {openIndex === index && (
+                                            <div className="px-6 pb-5">
+                                                <p className="text-text-medium">{item.answer}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </AnimateOnScroll>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const FinalCtaSection = () => (
+            <section className="final-cta-section bg-gradient-to-r from-primary-navy to-primary-teal py-20 text-white text-center">
+                <div className="container max-w-4xl mx-auto px-5">
+                    <AnimateOnScroll>
+                        <h2 className="font-merriweather text-3xl md:text-5xl font-bold mb-6">
+                            Your Empire Starts With One Decision
+                        </h2>
+                        <p className="text-xl mb-8 text-white/90">
+                            Every day you wait is another day living someone else's dream. 
+                            Join 2,847+ women who chose freedom over fear.
+                        </p>
+                        <CtaButton href="#checkout" variant="primary" className="mb-4">
+                            Start Building Your Empire →
+                        </CtaButton>
+                        <p className="text-sm text-white/70">
+                            ⚡ Limited spots remaining • Price increases in 24 hours
+                        </p>
+                    </AnimateOnScroll>
+                </div>
+            </section>
+        );
+        
+        const StickyCta = () => {
+            const [isVisible, setIsVisible] = useState(false);
+            useEffect(() => {
+                const toggleVisibility = () => {
+                    const showAt = window.innerHeight * 0.75;
+                    const scrollHeight = document.documentElement.scrollHeight;
+                    const clientHeight = document.documentElement.clientHeight;
+                    const hideBeforeFooter = 400; 
+
+                    if (
+                        window.scrollY > showAt &&
+                        window.scrollY < scrollHeight - clientHeight - hideBeforeFooter
+                    ) {
+                        setIsVisible(true);
+                    } else {
+                        setIsVisible(false);
+                    }
+                };
+                window.addEventListener('scroll', toggleVisibility);
+                return () => window.removeEventListener('scroll', toggleVisibility);
+            }, []);
+
+            return (
+                <div className={`fixed bottom-0 left-0 right-0 z-50 p-3 bg-bg-light/80 backdrop-blur-sm border-t border-gray-200 transition-transform duration-500 ease-in-out ${isVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+                    <div className="container max-w-4xl mx-auto px-5 flex justify-center items-center">
+                         <a href="#offer" className="w-full md:w-auto bg-gradient-to-r from-accent-coral to-accent-purple text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg hover:-translate-y-1 hover:shadow-2xl active:scale-95 transition-all duration-300 ease-in-out text-center">
+                           Get Instant Access Now →
+                         </a>
+                    </div>
+                </div>
+            );
+        };
+        
+        const ScrollToTopButton = () => {
+            const [isVisible, setIsVisible] = useState(false);
+            const toggleVisibility = () => {
+                if (window.scrollY > 300) {
+                    setIsVisible(true);
+                } else {
+                    setIsVisible(false);
+                }
+            };
+            const scrollToTop = () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+            };
+            useEffect(() => {
+                window.addEventListener('scroll', toggleVisibility);
+                return () => {
+                    window.removeEventListener('scroll', toggleVisibility);
+                };
+            }, []);
+            return (
+                <button
+                    type="button"
+                    onClick={scrollToTop}
+                    className={`fixed bottom-24 md:bottom-8 right-5 md:right-8 z-40 bg-accent-coral text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-accent-purple focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-coral transition-all duration-300 ease-in-out hover:-translate-y-1 active:scale-95 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5 pointer-events-none'}`}
+                    aria-label="Go to top"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+            );
+        };
+
+        // --- MAIN APP COMPONENT ---
+
+        function App() {
+            return (
+                <div className="bg-bg-light text-text-dark font-montserrat overflow-x-hidden">
+                    <main>
+                        <HeroSection />
+                        <AsSeenOnSection />
+                        <StatsSection />
+                        <PainPointsSection />
+                        <SolutionSection />
+                        <CreatorSection />
+                        <TestimonialsSection />
+                        <SocialBuzzSection />
+                        <BonusSection />
+                        <OfferSection />
+                        <FaqSection />
+                        <FinalCtaSection />
+                    </main>
+                    <StickyCta />
+                    <ScrollToTopButton />
+                </div>
+            );
         }
-      }
-
-      // إظهار تلميح صغير دون إزعاج
-      function showNudge() {
-        // نستخدم نفس التوست لكن بدون زر إذا أردت، هنا نخليه بالزر كحل شامل
-        showToast();
-      }
-
-      function showToast() {
-        toast.style.display = 'flex';
-      }
-      function hideToast() {
-        toast.style.display = 'none';
-      }
-
-      // تفعيل بالصوت بعد التفاعل: نرفع الـ mute ونطبّق فيد-إن
-      async function activateWithSound() {
-        if (userActivated) return;
-        userActivated = true;
-        hideToast();
-        try {
-          audio.muted = false;
-          await ensurePlaying();
-          await fadeTo(targetVolume, fadeMs);
-        } catch {
-          // إذا فشل، نخلي الزر ظاهر
-          showToast();
+        
+        const rootElement = document.getElementById('root');
+        if (!rootElement) {
+            throw new Error("Could not find root element to mount to");
         }
-      }
 
-      // نضمن أنه في حالة توقف، نشغله
-      async function ensurePlaying() {
-        if (audio.paused) {
-          await audio.play();
-        }
-      }
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(
+            <React.StrictMode>
+                <App />
+            </React.StrictMode>
+        );
 
-      // فيد-إن سلس للصوت
-      function fadeTo(vTarget, ms) {
-        return new Promise(resolve => {
-          const start = performance.now();
-          const vStart = audio.volume;
-          const delta = vTarget - vStart;
-          function step(t) {
-            const k = Math.min(1, (t - start) / ms);
-            audio.volume = vStart + delta * k;
-            if (k < 1) requestAnimationFrame(step);
-            else resolve();
-          }
-          requestAnimationFrame(step);
-        });
-      }
-
-      // مستمعات أول تفاعل (ضغط/لمس/كيبورد)
-      const gestureEvents = ['click','touchstart','pointerdown','keydown'];
-      gestureEvents.forEach(evt => window.addEventListener(evt, activateWithSound, { once:true, passive:true }));
-
-      // إذا رجع المستخدم للتاب (بعض المتصفحات تسمح وقتها)
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && !userActivated && audio.muted) {
-          // نحاول مرة أخرى تشغيل مكتوم
-          tryAutoplayMuted();
-        }
-      });
-
-      // إذا صار بإمكان التشغيل لاحقاً
-      audio.addEventListener('canplay', () => {
-        if (!triedAuto) tryAutoplayMuted();
-      });
-
-      // بداية: جرّب تشغيل مكتوم مباشرة
-      if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        tryAutoplayMuted();
-      } else {
-        document.addEventListener('DOMContentLoaded', tryAutoplayMuted);
-      }
-
-      // زر "تفعيل الصوت"
-      enableBtn.addEventListener('click', activateWithSound);
-    })();
-  </script>
+    </script>
 </body>
 </html>
