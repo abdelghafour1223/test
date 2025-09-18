@@ -1,605 +1,415 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المكنسة الكهربائية الذكية - تنظيف سهل وسريع</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Tajawal', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            overflow-x: hidden;
-        }
-        
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            background: #fff;
-            min-height: 100vh;
-            position: relative;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #c41e3a 0%, #228b22 100%);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/></svg>');
-            animation: sparkle 20s linear infinite;
-        }
-        
-        @keyframes sparkle {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .header p {
-            font-size: 1rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .price-badge {
-            background: linear-gradient(45deg, #ffd700, #ffed4a);
-            color: #c41e3a;
-            font-size: 1.5rem;
-            font-weight: 700;
-            padding: 10px 20px;
-            border-radius: 25px;
-            margin: 15px 0;
-            display: inline-block;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .product-gallery {
-            padding: 20px;
-            background: #fff;
-        }
-        
-        .main-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            margin-bottom: 15px;
-            transition: transform 0.3s ease;
-        }
-        
-        .main-image:hover {
-            transform: scale(1.02);
-        }
-        
-        .thumbnail-gallery {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-        
-        .thumbnail {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-        
-        .thumbnail:hover, .thumbnail.active {
-            border-color: #c41e3a;
-            transform: scale(1.1);
-        }
-        
-        .features {
-            padding: 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-        
-        .features h2 {
-            color: #c41e3a;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .feature-item {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .feature-item:hover {
-            transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        .feature-item h3 {
-            color: #228b22;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-        
-        .feature-item p {
-            font-size: 0.8rem;
-            color: #666;
-        }
-        
-        .why-choose {
-            padding: 20px;
-            background: white;
-        }
-        
-        .why-choose h2 {
-            color: #c41e3a;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .benefit-list {
-            list-style: none;
-        }
-        
-        .benefit-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            position: relative;
-            padding-right: 30px;
-        }
-        
-        .benefit-list li::before {
-            content: '✓';
-            position: absolute;
-            right: 0;
-            color: #228b22;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        
-        .order-section {
-            padding: 20px;
-            background: linear-gradient(135deg, #c41e3a 0%, #228b22 100%);
-            color: white;
-        }
-        
-        .order-section h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-        }
-        
-        .order-form {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            color: #333;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #c41e3a;
-        }
-        
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-        
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #c41e3a;
-            box-shadow: 0 0 10px rgba(196, 30, 58, 0.2);
-        }
-        
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(45deg, #c41e3a, #228b22);
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(196, 30, 58, 0.4);
-        }
-        
-        .floating-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(45deg, #c41e3a, #228b22);
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            animation: bounce 2s infinite;
-            transition: all 0.3s ease;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-10px); }
-            60% { transform: translateX(-50%) translateY(-5px); }
-        }
-        
-        .floating-btn:hover {
-            transform: translateX(-50%) translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-        }
-        
-        .thank-you-page {
-            display: none;
-            text-align: center;
-            padding: 50px 20px;
-            background: linear-gradient(135deg, #228b22 0%, #c41e3a 100%);
-            color: white;
-            min-height: 100vh;
-        }
-        
-        .thank-you-page.active {
-            display: block;
-        }
-        
-        .success-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            animation: checkmark 0.6s ease-in-out;
-        }
-        
-        @keyframes checkmark {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .delivery-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-        
-        .guarantee-badge {
-            background: linear-gradient(45deg, #ffd700, #ffed4a);
-            color: #c41e3a;
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 15px 0;
-            font-weight: 600;
-        }
-        
-        /* Hide main content when thank you page is active */
-        .main-content.hidden {
-            display: none;
-        }
-        
-        .error-message {
-            color: #c41e3a;
-            font-size: 0.9rem;
-            margin-top: 5px;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <h1>🔥 المكنسة الكهربائية الذكية 🔥</h1>
-                <p>تنظيف سهل وسريع لكل أنحاء البيت</p>
-                <div class="price-badge">
-                    فقط 199 درهم
-                </div>
-                <p>✨ توصيل مجاني لجميع أنحاء المغرب ✨</p>
-            </div>
+{% extends "base.html" %}
 
-            <!-- Product Gallery -->
-            <div class="product-gallery">
-                <img src="https://cdn.youcan.shop/stores/e8ebe1871da356d23fb8be6785bb8a76/products/w3UH451QexyIg70JM4FPNrPutmItxHdRm6zmy4OK_lg.jpeg" alt="المكنسة الكهربائية الذكية" class="main-image" id="mainImage">
-                
-                <div class="thumbnail-gallery">
-                    <img src="https://cdn.youcan.shop/stores/e8ebe1871da356d23fb8be6785bb8a76/products/w3UH451QexyIg70JM4FPNrPutmItxHdRm6zmy4OK_lg.jpeg" alt="صورة 1" class="thumbnail active" onclick="changeImage(this.src)">
-                    <img src="https://cdn.shopify.com/s/files/1/0800/1909/5852/files/ezgif-2-92ac44a7e7_480x480.webp?v=1696837674" alt="صورة 2" class="thumbnail" onclick="changeImage(this.src)">
-                    <img src="https://cdn.shopify.com/s/files/1/0800/1909/5852/files/ezgif-2-6b6e6e04bf_480x480.webp?v=1696837474" alt="صورة 3" class="thumbnail" onclick="changeImage(this.src)">
-                    <img src="https://cdn.youcan.shop/stores/e8ebe1871da356d23fb8be6785bb8a76/products/dRkpJ4YlBhgfXMzvXIcSqz1cqVMfNePiPQzRD8zn_lg.jpeg" alt="صورة 4" class="thumbnail" onclick="changeImage(this.src)">
-                    <img src="https://cdn.youcan.shop/stores/e8ebe1871da356d23fb8be6785bb8a76/products/riNeMfFbNGi82R2yY6ghW2vC6fhV3BSaWoysPx0Q_lg.jpeg" alt="صورة 5" class="thumbnail" onclick="changeImage(this.src)">
-                    <img src="https://cdn.youcan.shop/stores/e8ebe1871da356d23fb8be6785bb8a76/products/OMS2TbSDTuB51TjVzuSFdykTaBzHFTs4FaLGyTew_lg.jpeg" alt="صورة 6" class="thumbnail" onclick="changeImage(this.src)">
-                </div>
-            </div>
+{% block title %}لوحة التحكم - بوت مراقبة الفيزا الإسبانية{% endblock %}
 
-            <!-- Features -->
-            <div class="features">
-                <h2>🌟 مزايا المكنسة الذكية 🌟</h2>
-                <div class="feature-grid">
-                    <div class="feature-item">
-                        <span class="feature-icon">💪</span>
-                        <h3>قوة شفط عالية</h3>
-                        <p>تنظيف عميق لكل الأتربة والغبار</p>
+{% block content %}
+<div class="row">
+    <!-- بطاقات الإحصائيات -->
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">إجمالي الفحوصات</h6>
+                        <h2 class="mb-0">{{ stats.total_checks or 0 }}</h2>
                     </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">🔋</span>
-                        <h3>بطارية طويلة</h3>
-                        <p>تشتغل لمدة ساعة كاملة</p>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">🔇</span>
-                        <h3>صوت منخفض</h3>
-                        <p>تنظيف هادئ بدون إزعاج</p>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">🪶</span>
-                        <h3>خفيفة الوزن</h3>
-                        <p>سهلة الحمل والاستعمال</p>
+                    <div class="align-self-center">
+                        <i class="fas fa-search fa-2x"></i>
                     </div>
                 </div>
-            </div>
-
-            <!-- Why Choose -->
-            <div class="why-choose">
-                <h2>🤔 لماذا تختار هذه المكنسة؟</h2>
-                <ul class="benefit-list">
-                    <li>توفير الوقت والجهد في التنظيف</li>
-                    <li>تنظيف فعال للسجاد والأرضيات</li>
-                    <li>سهلة التخزين والصيانة</li>
-                    <li>جودة عالية بسعر مناسب</li>
-                    <li>ضمان شامل لمدة سنة كاملة</li>
-                    <li>خدمة عملاء متوفرة 24/7</li>
-                </ul>
-            </div>
-
-            <!-- Order Section -->
-            <div class="order-section" id="orderSection">
-                <h2>🛒 اطلب الآن واحصل على التوصيل المجاني</h2>
-                <form class="order-form" id="orderForm">
-                    <div class="form-group">
-                        <label for="fullName">الاسم الكامل *</label>
-                        <input type="text" id="fullName" name="fullName" required>
-                        <div class="error-message" id="nameError">يرجى إدخال الاسم الكامل</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="city">المدينة *</label>
-                        <select id="city" name="city" required>
-                            <option value="">اختر المدينة</option>
-                            <option value="الرباط">الرباط</option>
-                            <option value="الدار البيضاء">الدار البيضاء</option>
-                            <option value="فاس">فاس</option>
-                            <option value="مراكش">مراكش</option>
-                            <option value="أغادير">أغادير</option>
-                            <option value="طنجة">طنجة</option>
-                            <option value="وجدة">وجدة</option>
-                            <option value="القنيطرة">القنيطرة</option>
-                            <option value="تطوان">تطوان</option>
-                            <option value="المحمدية">المحمدية</option>
-                            <option value="سلا">سلا</option>
-                            <option value="مكناس">مكناس</option>
-                            <option value="الجديدة">الجديدة</option>
-                            <option value="خريبكة">خريبكة</option>
-                            <option value="بني ملال">بني ملال</option>
-                            <option value="الناظور">الناظور</option>
-                            <option value="أخرى">أخرى</option>
-                        </select>
-                        <div class="error-message" id="cityError">يرجى اختيار المدينة</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="phone">رقم الهاتف *</label>
-                        <input type="tel" id="phone" name="phone" placeholder="06XXXXXXXX" required>
-                        <div class="error-message" id="phoneError">يرجى إدخال رقم هاتف صحيح</div>
-                    </div>
-                    
-                    <div class="guarantee-badge">
-                        ✅ ضمان استرداد المال في حالة عدم الرضا
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">
-                        🚚 اطلب الآن - الدفع عند الاستلام
-                    </button>
-                </form>
             </div>
         </div>
-
-        <!-- Thank You Page -->
-        <div class="thank-you-page" id="thankYouPage">
-            <div class="success-icon">✅</div>
-            <h1>شكراً لك على طلبك!</h1>
-            <p style="font-size: 1.2rem; margin: 20px 0;">تم استلام طلبك بنجاح</p>
-            
-            <div class="delivery-info">
-                <h3>📞 سيتصل بك فريقنا قريباً</h3>
-                <p>لتأكيد الطلب وتحديد موعد التوصيل</p>
-                
-                <div style="margin: 20px 0;">
-                    <h4>🚚 معلومات التوصيل:</h4>
-                    <p>• التوصيل مجاني لجميع أنحاء المغرب</p>
-                    <p>• مدة التوصيل: 2-4 أيام عمل</p>
-                    <p>• الدفع عند الاستلام</p>
-                </div>
-                
-                <div class="guarantee-badge">
-                    ضمان شامل لمدة سنة كاملة
-                </div>
-            </div>
-            
-            <p style="margin-top: 30px; opacity: 0.8;">
-                في حالة وجود أي استفسار، لا تتردد في الاتصال بنا
-            </p>
-        </div>
-
-        <!-- Floating Button -->
-        <button class="floating-btn" onclick="scrollToOrder()">
-            اطلب الآن 🛒
-        </button>
     </div>
 
-    <script>
-        // تغيير الصورة الرئيسية
-        function changeImage(src) {
-            document.getElementById('mainImage').src = src;
-            
-            // تحديث الصورة المصغرة النشطة
-            document.querySelectorAll('.thumbnail').forEach(thumb => {
-                thumb.classList.remove('active');
-            });
-            
-            event.target.classList.add('active');
-        }
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">نتائج إيجابية</h6>
+                        <h2 class="mb-0">{{ stats.positive_results or 0 }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // التمرير إلى قسم الطلب
-        function scrollToOrder() {
-            document.getElementById('orderSection').scrollIntoView({ 
-                behavior: 'smooth' 
-            });
-        }
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">معدل النجاح</h6>
+                        <h2 class="mb-0">{{ stats.success_rate or 0 }}%</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-percentage fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // التحقق من صحة النموذج
-        function validateForm() {
-            let isValid = true;
-            
-            // التحقق من الاسم
-            const fullName = document.getElementById('fullName');
-            const nameError = document.getElementById('nameError');
-            if (fullName.value.trim().length < 2) {
-                nameError.style.display = 'block';
-                isValid = false;
-            } else {
-                nameError.style.display = 'none';
-            }
-            
-            // التحقق من المدينة
-            const city = document.getElementById('city');
-            const cityError = document.getElementById('cityError');
-            if (city.value === '') {
-                cityError.style.display = 'block';
-                isValid = false;
-            } else {
-                cityError.style.display = 'none';
-            }
-            
-            // التحقق من رقم الهاتف
-            const phone = document.getElementById('phone');
-            const phoneError = document.getElementById('phoneError');
-            const phoneRegex = /^0[67][0-9]{8}$/;
-            if (!phoneRegex.test(phone.value)) {
-                phoneError.style.display = 'block';
-                isValid = false;
-            } else {
-                phoneError.style.display = 'none';
-            }
-            
-            return isValid;
-        }
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card bg-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">آخر فحص</h6>
+                        <p class="mb-0" id="last-check-time">
+                            {% if stats.last_check %}
+                                {{ moment(stats.last_check).fromNow() }}
+                            {% else %}
+                                لا يوجد
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // إرسال النموذج
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (validateForm()) {
-                // إخفاء المحتوى الرئيسي وإظهار صفحة الشكر
-                document.querySelector('.main-content').classList.add('hidden');
-                document.getElementById('thankYouPage').classList.add('active');
-                document.querySelector('.floating-btn').style.display = 'none';
+<div class="row">
+    <!-- التحكم في البوت -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-robot me-2"></i>
+                    التحكم في البوت
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <span id="bot-status-text" class="badge bg-secondary fs-6 p-2">
+                        {% if bot_running %}
+                            <i class="fas fa-play me-1"></i> يعمل
+                        {% else %}
+                            <i class="fas fa-stop me-1"></i> متوقف
+                        {% endif %}
+                    </span>
+                </div>
                 
-                // هنا يمكنك إضافة كود إرسال البيانات إلى الخادم
-                console.log('تم إرسال الطلب:', {
-                    name: document.getElementById('fullName').value,
-                    city: document.getElementById('city').value,
-                    phone: document.getElementById('phone').value
-                });
-            }
-        });
+                <div class="d-grid gap-2">
+                    <button id="start-bot-btn" class="btn btn-success" 
+                            {% if bot_running %}disabled{% endif %}>
+                        <i class="fas fa-play me-1"></i>
+                        بدء التشغيل
+                    </button>
+                    <button id="stop-bot-btn" class="btn btn-danger" 
+                            {% if not bot_running %}disabled{% endif %}>
+                        <i class="fas fa-stop me-1"></i>
+                        إيقاف التشغيل
+                    </button>
+                    <button id="restart-bot-btn" class="btn btn-warning">
+                        <i class="fas fa-redo me-1"></i>
+                        إعادة التشغيل
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // إخفاء الزر المتحرك عند الوصول لقسم الطلب
-        window.addEventListener('scroll', function() {
-            const orderSection = document.getElementById('orderSection');
-            const floatingBtn = document.querySelector('.floating-btn');
-            const rect = orderSection.getBoundingClientRect();
+    <!-- نشاط المدن -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-city me-2"></i>
+                    نشاط المدن
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="cityActivityChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- النتائج الأخيرة -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    النتائج الأخيرة
+                </h5>
+                <a href="{{ url_for('reports') }}" class="btn btn-sm btn-outline-primary">
+                    عرض الكل
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_results %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>المدينة</th>
+                                    <th>النتيجة</th>
+                                    <th>التوقيت</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in recent_results[:5] %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-map-marker-alt me-1 text-primary"></i>
+                                        {{ result[1] }}
+                                    </td>
+                                    <td>
+                                        {% if result[2] == 'YES' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>متوفر
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>غير متوفر
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ moment(result[5]).format('DD/MM/YYYY HH:mm') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if result[6] %}
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    onclick="viewScreenshot('{{ result[6] }}')">
+                                                <i class="fas fa-image me-1"></i>
+                                                لقطة الشاشة
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">لا توجد نتائج حتى الآن</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- التحديثات المباشرة -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-broadcast-tower me-2"></i>
+                    التحديثات المباشرة
+                    <span id="live-indicator" class="badge bg-success ms-2">
+                        <i class="fas fa-circle"></i>
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="live-updates" style="height: 300px; overflow-y: auto;">
+                    <div class="text-center py-4">
+                        <i class="fas fa-satellite-dish fa-2x text-muted mb-2"></i>
+                        <p class="text-muted">في انتظار التحديثات...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal لعرض لقطة الشاشة -->
+<div class="modal fade" id="screenshotModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">لقطة الشاشة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="screenshot-img" src="" class="img-fluid" alt="لقطة الشاشة">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// إعداد الرسم البياني
+const ctx = document.getElementById('cityActivityChart').getContext('2d');
+const cityActivityChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for city, count in stats.city_activity %}
+                '{{ city }}',
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for city, count in stats.city_activity %}
+                    {{ count }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40',
+                '#FF6384'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                rtl: true
+            }
+        }
+    }
+});
+
+// وظائف التحكم في البوت
+document.getElementById('start-bot-btn').addEventListener('click', function() {
+    controlBot('start');
+});
+
+document.getElementById('stop-bot-btn').addEventListener('click', function() {
+    controlBot('stop');
+});
+
+document.getElementById('restart-bot-btn').addEventListener('click', function() {
+    controlBot('stop', function() {
+        setTimeout(() => controlBot('start'), 2000);
+    });
+});
+
+function controlBot(action, callback) {
+    showLoading();
+    
+    fetch(`/api/${action}_bot`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        if (data.success) {
+            showAlert('success', data.message);
+            updateBotStatus();
+        } else {
+            showAlert('danger', data.message);
+        }
+        
+        if (callback) callback();
+    })
+    .catch(error => {
+        hideLoading();
+        showAlert('danger', 'حدث خطأ في الاتصال');
+        console.error('Error:', error);
+    });
+}
+
+function updateBotStatus() {
+    fetch('/api/bot_status')
+        .then(response => response.json())
+        .then(data => {
+            const statusText = document.getElementById('bot-status-text');
+            const statusIndicator = document.getElementById('bot-status-indicator');
+            const startBtn = document.getElementById('start-bot-btn');
+            const stopBtn = document.getElementById('stop-bot-btn');
             
-            if (rect.top <= window.innerHeight && rect.bottom >= 0) {
-                floatingBtn.style.opacity = '0.5';
+            if (data.running) {
+                statusText.innerHTML = '<i class="fas fa-play me-1"></i> يعمل';
+                statusText.className = 'badge bg-success fs-6 p-2';
+                statusIndicator.innerHTML = '<i class="fas fa-circle me-1"></i> نشط';
+                statusIndicator.className = 'badge bg-success';
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
             } else {
-                floatingBtn.style.opacity = '1';
+                statusText.innerHTML = '<i class="fas fa-stop me-1"></i> متوقف';
+                statusText.className = 'badge bg-danger fs-6 p-2';
+                statusIndicator.innerHTML = '<i class="fas fa-circle me-1"></i> متوقف';
+                statusIndicator.className = 'badge bg-danger';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
             }
         });
-    </script>
-</body>
-</html>
+}
+
+function viewScreenshot(path) {
+    document.getElementById('screenshot-img').src = path;
+    new bootstrap.Modal(document.getElementById('screenshotModal')).show();
+}
+
+// تحديث حالة البوت كل 30 ثانية
+setInterval(updateBotStatus, 30000);
+
+// التحديثات المباشرة
+const liveUpdatesContainer = document.getElementById('live-updates');
+
+function addLiveUpdate(message, type = 'info') {
+    const updateElement = document.createElement('div');
+    updateElement.className = `alert alert-${type} alert-sm mb-2`;
+    updateElement.innerHTML = `
+        <small class="text-muted">${new Date().toLocaleString('ar-SA')}</small><br>
+        ${message}
+    `;
+    
+    liveUpdatesContainer.insertBefore(updateElement, liveUpdatesContainer.firstChild);
+    
+    // الحفاظ على آخر 10 تحديثات فقط
+    while (liveUpdatesContainer.children.length > 10) {
+        liveUpdatesContainer.removeChild(liveUpdatesContainer.lastChild);
+    }
+}
+
+// Socket.IO للتحديثات المباشرة
+const socket = io();
+
+socket.on('connect', function() {
+    document.getElementById('live-indicator').className = 'badge bg-success ms-2';
+    addLiveUpdate('تم الاتصال بالخادم', 'success');
+});
+
+socket.on('disconnect', function() {
+    document.getElementById('live-indicator').className = 'badge bg-danger ms-2';
+    addLiveUpdate('انقطع الاتصال بالخادم', 'danger');
+});
+
+socket.on('monitoring_update', function(data) {
+    const resultType = data.result === 'YES' ? 'success' : 'warning';
+    const resultText = data.result === 'YES' ? 'متوفر' : 'غير متوفر';
+    
+    addLiveUpdate(`
+        <strong>${data.city}</strong>: ${resultText}
+        ${data.available_dates && data.available_dates.length > 1 ? 
+            `<br><small>التواريخ المتاحة: ${data.available_dates.join(', ')}</small>` : ''}
+    `, resultType);
+});
+
+socket.on('bot_status_changed', function(data) {
+    updateBotStatus();
+    const statusText = data.status === 'running' ? 'بدأ التشغيل' : 'تم الإيقاف';
+    addLiveUpdate(`حالة البوت: ${statusText}`, 'info');
+});
+</script>
+{% endblock %}
