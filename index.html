@@ -44,22 +44,148 @@
             opacity: 0.95;
         }
 
+        /* Enhanced CTA Button with Multiple Animations */
         .cta-button {
             display: inline-block;
-            background: #ff6b6b;
+            position: relative;
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
             color: white;
-            padding: 18px 45px;
-            font-size: 1.2rem;
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
             border-radius: 50px;
             text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            z-index: 1;
+            
+            /* Multiple animations combined */
+            animation: 
+                pulse 2s ease-in-out infinite,
+                float 3s ease-in-out infinite,
+                glow 2s ease-in-out infinite;
+            
+            box-shadow: 
+                0 0 20px rgba(255, 107, 107, 0.6),
+                0 0 40px rgba(255, 107, 107, 0.4),
+                0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Pulsing ripple effect */
+        .cta-button::before,
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50px;
+            background: rgba(255, 107, 107, 0.4);
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            animation: ripple 2s ease-out infinite;
+        }
+
+        .cta-button::after {
+            animation-delay: 1s;
+        }
+
+        /* Shine effect overlay */
+        .cta-button .shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.4), 
+                transparent);
+            animation: shine 3s ease-in-out infinite;
         }
 
         .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            background: #ff5252;
+            transform: translateY(-5px) scale(1.05);
+            animation: 
+                shake 0.5s ease-in-out,
+                pulse 2s ease-in-out infinite,
+                glow 2s ease-in-out infinite;
+            box-shadow: 
+                0 0 30px rgba(255, 107, 107, 0.8),
+                0 0 60px rgba(255, 107, 107, 0.6),
+                0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .cta-button:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* Pulse Animation - makes button grow and shrink */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Ripple Effect - expanding circles */
+        @keyframes ripple {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2);
+                opacity: 0;
+            }
+        }
+
+        /* Glow Effect - pulsing glow */
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 20px rgba(255, 107, 107, 0.6),
+                    0 0 40px rgba(255, 107, 107, 0.4),
+                    0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    0 0 30px rgba(255, 107, 107, 0.9),
+                    0 0 60px rgba(255, 107, 107, 0.7),
+                    0 0 80px rgba(255, 107, 107, 0.5),
+                    0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        /* Float Effect - gentle up and down movement */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Shake Effect on hover */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+            20%, 40%, 60%, 80% { transform: translateX(3px); }
+        }
+
+        /* Shine Effect - light sweep across button */
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+            50%, 100% {
+                left: 100%;
+            }
         }
 
         /* Benefits Section */
@@ -139,65 +265,52 @@
             font-size: 1.1rem;
         }
 
-        /* Application Form */
-        .application {
-            padding: 60px 0;
+        /* Contact CTA Section */
+        .contact-cta {
+            padding: 80px 0;
             background: white;
+            text-align: center;
         }
 
-        .form-container {
-            max-width: 600px;
+        .contact-info {
+            max-width: 700px;
             margin: 0 auto;
-            background: #f8f9fa;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .submit-button {
-            width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
             color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
 
-        .submit-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        .contact-info h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .contact-info p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .whatsapp-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+        }
+
+        .whatsapp-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(37, 211, 102, 0.5);
+            background: #20ba5a;
         }
 
         /* Urgency Banner */
@@ -208,6 +321,16 @@
             padding: 15px;
             font-size: 1.1rem;
             font-weight: bold;
+            animation: urgencyPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes urgencyPulse {
+            0%, 100% {
+                background: #ff6b6b;
+            }
+            50% {
+                background: #ff5252;
+            }
         }
 
         /* Mobile Responsive */
@@ -220,12 +343,21 @@
                 font-size: 1.1rem;
             }
 
+            .cta-button {
+                padding: 18px 40px;
+                font-size: 1.1rem;
+            }
+
             .section-title {
                 font-size: 1.8rem;
             }
 
-            .form-container {
-                padding: 25px;
+            .contact-info {
+                padding: 30px 20px;
+            }
+
+            .contact-info h2 {
+                font-size: 1.6rem;
             }
         }
 
@@ -253,7 +385,10 @@
             <h1>✨ انضمي لفريقنا واعملي من منزلك</h1>
             <p>فرصة عمل مرنة مصممة خصيصاً للنساء الطموحات</p>
             <p>دخل ثابت • مرونة تامة • تطوير مهني • بيئة داعمة</p>
-            <a href="#application" class="cta-button">سجلي الآن - مجاناً</a>
+            <a href="#contact" class="cta-button">
+                <span class="shine"></span>
+                سجلي الآن - مجاناً 🚀
+            </a>
         </div>
     </section>
 
@@ -298,6 +433,13 @@
                     <p>مسار وظيفي واضح مع إمكانيات ترقية حقيقية</p>
                 </div>
             </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="#contact" class="cta-button">
+                    <span class="shine"></span>
+                    ابدأي رحلتك معنا الآن ✨
+                </a>
+            </div>
         </div>
     </section>
 
@@ -321,114 +463,63 @@
                     <p class="testimonial-author">- فاطمة، 35 سنة، مراكش</p>
                 </div>
             </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="#contact" class="cta-button">
+                    <span class="shine"></span>
+                    كوني واحدة من قصص النجاح 💪
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- Application Form -->
-    <section class="application" id="application">
+    <!-- Contact CTA Section -->
+    <section class="contact-cta" id="contact">
         <div class="container">
-            <h2 class="section-title">سجلي الآن للانضمام</h2>
-            <div class="form-container">
-                <form id="applicationForm">
-                    <div class="form-group">
-                        <label for="name">الاسم الكامل *</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">البريد الإلكتروني *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone">رقم الهاتف (واتساب) *</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="city">المدينة *</label>
-                        <select id="city" name="city" required>
-                            <option value="">اختاري المدينة</option>
-                            <option value="casablanca">الدار البيضاء</option>
-                            <option value="rabat">الرباط</option>
-                            <option value="marrakech">مراكش</option>
-                            <option value="fes">فاس</option>
-                            <option value="tangier">طنجة</option>
-                            <option value="agadir">أكادير</option>
-                            <option value="other">أخرى</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="experience">الخبرة السابقة *</label>
-                        <select id="experience" name="experience" required>
-                            <option value="">اختاري مستوى الخبرة</option>
-                            <option value="no-experience">بدون خبرة</option>
-                            <option value="beginner">خبرة بسيطة (أقل من سنة)</option>
-                            <option value="intermediate">خبرة متوسطة (1-3 سنوات)</option>
-                            <option value="advanced">خبرة متقدمة (أكثر من 3 سنوات)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="hours">عدد الساعات المتاحة يومياً *</label>
-                        <select id="hours" name="hours" required>
-                            <option value="">اختاري عدد الساعات</option>
-                            <option value="2-4">2-4 ساعات</option>
-                            <option value="4-6">4-6 ساعات</option>
-                            <option value="6-8">6-8 ساعات</option>
-                            <option value="8+">أكثر من 8 ساعات</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message">لماذا ترغبين في الانضمام؟</label>
-                        <textarea id="message" name="message" rows="4"></textarea>
-                    </div>
-
-                    <button type="submit" class="submit-button">
-                        إرسال الطلب الآن 🚀
-                    </button>
-                </form>
+            <div class="contact-info">
+                <h2>🎯 جاهزة للبدء؟</h2>
+                <p>تواصلي معنا الآن عبر واتساب واحصلي على جميع التفاصيل</p>
+                <p style="font-size: 1rem; margin-bottom: 30px;">سيتم الرد عليك خلال دقائق من فريقنا المتخصص</p>
+                
+                <a href="https://wa.me/212XXXXXXXXX?text=مرحباً، أريد معرفة المزيد عن فرصة العمل للنساء" 
+                   class="whatsapp-button" 
+                   target="_blank">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    راسلينا على واتساب
+                </a>
+                
+                <p style="margin-top: 30px; font-size: 0.95rem; opacity: 0.9;">
+                    📞 أو اتصلي بنا: <strong>06XX-XXXXXX</strong><br>
+                    ⏰ متاحون من السبت للخميس: 9 صباحاً - 6 مساءً
+                </p>
             </div>
         </div>
     </section>
 
     <script>
-        // Form submission handling
-        document.getElementById('applicationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                city: document.getElementById('city').value,
-                experience: document.getElementById('experience').value,
-                hours: document.getElementById('hours').value,
-                message: document.getElementById('message').value,
-                timestamp: new Date().toISOString()
-            };
-
-            // Here you can integrate with your backend or Google Sheets API
-            console.log('Form submitted:', formData);
-            
-            // Show success message
-            alert('شكراً لك! تم استلام طلبك بنجاح. سنتواصل معك قريباً عبر واتساب.');
-            
-            // Reset form
-            this.reset();
-            
-            // You can add your API call here to send data to backend/Google Sheets
-            // Example: fetch('YOUR_API_ENDPOINT', { method: 'POST', body: JSON.stringify(formData) })
+        // Smooth scroll for CTA buttons
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
         });
 
-        // Smooth scroll for CTA button
-        document.querySelector('.cta-button').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.querySelector('#application').scrollIntoView({ 
-                behavior: 'smooth' 
+        // Add extra visual feedback on button click
+        document.querySelectorAll('.cta-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
             });
         });
     </script>
