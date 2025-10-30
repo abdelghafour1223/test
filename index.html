@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جاري التوجيه...</title>
+    <title>الانضمام للمجموعة</title>
     
     <!-- TikTok Pixel Code Start -->
     <script>
@@ -22,69 +22,37 @@
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-            background-color: #f0f2f5; /* لون خلفية قريب من واتساب */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
-            text-align: center;
+            margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; color: #333; text-align: center;
         }
-
         .container {
-            background-color: #ffffff;
-            padding: 30px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 90%;
-            width: 350px;
+            background-color: #ffffff; padding: 30px 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); max-width: 90%; width: 350px;
         }
-
         .whatsapp-icon {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 20px;
+            width: 60px; height: 60px; margin-bottom: 20px;
         }
-
         h1 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: #128C7E; /* لون واتساب الأخضر */
+            font-size: 22px; margin-bottom: 15px; color: #128C7E;
         }
-
         p {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 25px;
+            font-size: 16px; line-height: 1.6; margin-bottom: 25px;
         }
-
+        /* تم إخفاء دائرة التحميل لأن التوجيه التلقائي معطل */
         .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #128C7E;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px auto;
+            display: none; 
         }
-
-        .fallback-link {
-            font-size: 14px;
-            color: #555;
-        }
-
-        .fallback-link a {
-            color: #075E54; /* لون واتساب أغمق */
-            text-decoration: underline;
+        .join-button {
+            display: inline-block;
+            background-color: #25D366;
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
             font-weight: bold;
+            font-size: 18px;
+            transition: background-color 0.3s;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .join-button:hover {
+            background-color: #128C7E;
         }
     </style>
 </head>
@@ -92,32 +60,32 @@
 
     <div class="container">
         <svg class="whatsapp-icon" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><path d="M90 43.84a44.08 44.08 0 0 0-44.18-44.08c-24.4 0-44.18 19.78-44.18 44.08 0 7.8 2.04 15.25 5.78 21.64L0 90l22.86-5.7c6.15 3.4 13.2 5.28 20.48 5.28 24.4 0 44.18-19.78 44.18-44.08zm-44.18 39.54c-6.66 0-13-1.78-18.5-5.04l-1.35-.8-13.75 3.42 3.5-13.4-1-1.48a39.18 39.18 0 0 1-5.9-20.12c0-21.6 17.56-39.15 39.18-39.15a39.1 39.1 0 0 1 39.18 39.15c0 21.6-17.58 39.16-39.18 39.16zm21.05-12.87c-1.16-.58-6.88-3.4-7.95-3.78-1.06-.38-1.84-.58-2.6 0-.78.58-3.02 3.78-3.7 4.56-1.18 1.3-1.8 1.4-3.32.9-1.5-.5-6.3-2.3-12-7.4-4.4-3.95-7.4-8.8-8.28-10.28-.9-1.48-.1-2.3.48-2.88.5-.5 1.1-.6 1.65-1s1.16-1.86 1.74-2.8 1.74-1.63 2.6-2.7.4-.87.2-1.63c-.2-.77-2.6-6.25-3.56-8.54-1-2.3-1.9-1.9-2.6-1.98-.68-.07-1.45-.08-2.23-.08a3.9 3.9 0 0 0-4.18 4.08c0 2.4 1.4 5.35 1.4 5.45s3.58 8.6 8.7 12.02c5.1 3.4 9.12 4.4 11.23 4.4 3.12 0 5.8-2.07 6.6-4.07.8-2 2.5-4.5 3.2-4.5.7 0 1.4.2 1.4.3.5.5 3.5 4.1 4.1 4.8.6.7 1 1 1.5 1s1.17.8 2.3.8c1.1 0 2.8-.5 3.2-1 .4-.5 1.4-1.9 1.4-4.1 0-2.2-1.4-4.1-2-4.6z" fill="#128c7e" fill-rule="evenodd"/></svg>
-        <h1>لحظة من فضلك!</h1>
-        <p>يتم الآن تحويلك إلى مجموعتنا الحصرية على واتساب للانضمام والاستفادة من العروض.</p>
+        <h1>الانضمام إلى المجموعة</h1>
+        <p>اضغط على الزر أدناه للانضمام إلى مجموعتنا الحصرية على واتساب والاستفادة من العروض.</p>
         <div class="loader"></div>
-        <p class="fallback-link">
-            إذا لم يتم تحويلك خلال 3 ثوانٍ، 
-            <a id="manualRedirectLink" href="#">اضغط هنا للانضمام</a>.
-        </p>
+        <a id="joinButton" href="#" class="join-button">الانضمام الآن</a>
     </div>
 
     <script>
-        // === !!! الجزء الوحيد لي خاصك تبدل دابا !!! === //
+        // ===!!! الجزء الوحيد لي خاصك تبدل !!! === //
 
-        // 1. حط رابط مجموعة واتساب ديالك هنا بلاصت الرابط الحالي
+        // حط رابط مجموعة واتساب ديالك هنا بلاصت الرابط الحالي
         const whatsappGroupLink = "https://chat.whatsapp.com/YOUR_INVITE_CODE_HERE"; 
         
-        // 2. حدد شحال من ثانية يتسنى قبل التوجيه (3000 كتعني 3 ثواني)
+        // ============================================ //
+        
+        // الكود لي كايحط الرابط فالزر (ماتقيسوش)
+        document.getElementById('joinButton').href = whatsappGroupLink;
+        
+        /* 
+        =========================================================
+        == تم تعطيل كود التوجيه التلقائي مؤقتاً لإعداد الأحداث ==
+        =========================================================
         const redirectDelay = 3000; 
-
-        // ======================================================= //
-        
-        // الكود لي كايدير التوجيه التلقائي (ماتقيسوش)
-        document.getElementById('manualRedirectLink').href = whatsappGroupLink;
-        
         setTimeout(function() {
             window.location.href = whatsappGroupLink;
         }, redirectDelay);
+        */
     </script>
 
 </body>
