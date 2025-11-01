@@ -48,7 +48,7 @@
 
     <div class="container">
         <h1>الانضمام عبر واتساب</h1>
-        <p>اضغط على الزر أدناه للتواصل معنا مباشرة عبر واتساب.</p>
+        <p>سيتم توجيهك مباشرة إلى واتساب...</p>
         <a id="joinButton" href="#" class="join-button">الانضمام الآن</a>
     </div>
 
@@ -59,12 +59,10 @@
         // ربط الزر بالرابط
         document.getElementById('joinButton').href = whatsappLink;
 
-        // التوجيه التلقائي متوقف مؤقتاً حتى إعداد الإيفانت
-        /*
+        // التوجيه التلقائي بعد 0.001 ثانية (1ms)
         setTimeout(function() {
             window.location.href = whatsappLink;
-        }, 100);
-        */
+        }, 1);
     </script>
 
 </body>
