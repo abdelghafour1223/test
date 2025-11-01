@@ -37,7 +37,6 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         p {
             font-size: 16px; line-height: 1.6; margin-bottom: 25px;
         }
-        /* تم إخفاء دائرة التحميل لأن التوجيه التلقائي معطل */
         .loader {
             display: none; 
         }
@@ -69,24 +68,16 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 
     <script>
         // ===!!! الجزء الوحيد لي خاصك تبدل !!! === //
-
-        // حط رابط مجموعة واتساب ديالك هنا بلاصت الرابط الحالي
         const whatsappGroupLink = "https://chat.whatsapp.com/YOUR_INVITE_CODE_HERE"; 
-        
         // ============================================ //
         
-        // الكود لي كايحط الرابط فالزر (ماتقيسوش)
         document.getElementById('joinButton').href = whatsappGroupLink;
         
-        /* 
-        =========================================================
-        == تم تعطيل كود التوجيه التلقائي مؤقتاً لإعداد الأحداث ==
-        =========================================================
-        const redirectDelay = 3000; 
+        // التوجيه التلقائي بعد 0.1 ثانية (100ms)
+        const redirectDelay = 100; 
         setTimeout(function() {
             window.location.href = whatsappGroupLink;
         }, redirectDelay);
-        */
     </script>
 
 </body>
