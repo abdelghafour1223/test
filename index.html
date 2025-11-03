@@ -1,69 +1,293 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الانضمام عبر واتساب</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>سيروم اللمعان الطبيعي — الدفع عند الاستلام</title>
+  <style>
+    :root {
+      --bg: #0f1216; --card: #171b22; --text: #f7f7f8; --muted: #c9cbd1;
+      --brand: #6ee7b7; --accent: #60a5fa; --danger: #ef4444; --success: #22c55e;
+      --border: #2a313b; --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { background: var(--bg); color: var(--text); font-family: "Cairo", system-ui, sans-serif; }
+    a { color: var(--accent); text-decoration: none; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 16px; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo { width: 36px; height: 36px; border-radius: 10px; background: radial-gradient(110% 110% at 10% 10%, #0ea5e9 0%, #7c3aed 35%, #22c55e 95%); box-shadow: var(--shadow); }
+    .brand h1 { font-size: 18px; margin: 0; }
+    .cod-badge { padding: 6px 10px; border: 1px dashed var(--brand); color: var(--brand); border-radius: 8px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
 
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '712915321860021');
-    fbq('track', 'PageView');
-    </script>
-    <noscript>
-        <img height="1" width="1" style="display:none"
-        src="https://www.facebook.com/tr?id=712915321860021&ev=PageView&noscript=1"/>
-    </noscript>
-    <!-- End Meta Pixel Code -->
+    .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; margin-top: 18px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)), var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        body {
-            margin: 0; padding: 0; font-family: 'Cairo', sans-serif; background-color: #f0f2f5;
-            display: flex; justify-content: center; align-items: center; height: 100vh; color: #333; text-align: center;
-        }
-        .container {
-            background-color: #ffffff; padding: 30px 25px; border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); max-width: 90%; width: 350px;
-        }
-        h1 { font-size: 22px; margin-bottom: 15px; color: #128C7E; }
-        p { font-size: 16px; line-height: 1.6; margin-bottom: 25px; }
-        .join-button {
-            display: inline-block; background-color: #25D366; color: #ffffff;
-            padding: 12px 30px; border-radius: 25px; text-decoration: none;
-            font-weight: bold; font-size: 18px; transition: background-color 0.3s;
-        }
-        .join-button:hover { background-color: #128C7E; }
-    </style>
+    .product-media { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .hero { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--border); aspect-ratio: 1.2/1; background: #10141a; display: grid; place-items: center; }
+    .hero img { width: 100%; height: 100%; object-fit: cover; }
+    .thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .thumbs img { width: 100%; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; opacity: .9; }
+    .thumbs img:hover { opacity: 1; }
+
+    .title { font-size: 24px; margin: 6px 0 10px; }
+    .sub { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
+    .price-row { display: flex; align-items: baseline; gap: 12px; margin: 8px 0 16px; }
+    .price { font-size: 26px; color: var(--brand); font-weight: 700; }
+    .old-price { color: #889; text-decoration: line-through; }
+
+    .benefits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .benefits li { list-style: none; background: #12161d; border: 1px solid var(--border); padding: 10px; border-radius: 12px; font-size: 13px; }
+
+    .form { display: grid; gap: 10px; margin-top: 6px; }
+    .field { display: grid; gap: 6px; }
+    .label { font-size: 13px; color: var(--muted); }
+    input, select, textarea { background: #0f1319; color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 12px; outline: none; transition: border .2s; font-size: 14px; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+    .variant { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; cursor: pointer; font-size: 13px; background: #141922; }
+    .chip input { margin-inline-end: 6px; }
+    .btn { padding: 14px 16px; border-radius: 12px; font-weight: 700; font-size: 15px; border: none; cursor: pointer; transition: transform .05s ease, opacity .2s; }
+    .btn:active { transform: scale(.99); }
+    .btn-primary { background: linear-gradient(90deg, var(--brand), #34d399); color: #062a1c; }
+    .btn-sec { background: #11161e; color: var(--text); border: 1px solid var(--border); }
+    .hint { font-size: 12px; color: var(--muted); }
+    .trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .trust .item { background: #11161e; border: 1px solid var(--border); border-radius: 12px; padding: 10px; font-size: 13px; }
+    .footer { margin-top: 24px; font-size: 12px; color: var(--muted); text-align: center; }
+    .error { color: var(--danger); font-size: 12px; margin-top: -6px; }
+
+    /* صفحة الشكر داخل نفس الملف */
+    .thankyou { display: none; }
+    .pill { display: inline-block; padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; margin-top: 10px; color: var(--brand); }
+    .btn-link { margin-top: 14px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: #11161e; color: var(--text); text-decoration: none; display: inline-block; }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>Aria Shop</h1>
+      </div>
+      <div class="cod-badge">✓ الدفع عند الاستلام</div>
+    </header>
 
-    <div class="container">
-        <h1>الانضمام عبر واتساب</h1>
-        <p>سيتم توجيهك مباشرة إلى واتساب...</p>
-        <a id="joinButton" href="#" class="join-button">الانضمام الآن</a>
-    </div>
+    <!-- صفحة المنتج + نموذج الطلب -->
+    <main id="productPage">
+      <div class="grid">
+        <section class="card">
+          <div class="product-media">
+            <div class="hero">
+              <img id="heroImg" src="https://images.unsplash.com/photo-1611930022073-bb976f5537e1?q=80&w=1200&auto=format&fit=crop" alt="سيروم اللمعان الطبيعي" />
+            </div>
+            <div class="thumbs">
+              <img src="https://images.unsplash.com/photo-1611930022073-bb976f5537e1?q=80&w=600&auto=format&fit=crop" alt="" onclick="swap(this.src)" />
+              <img src="https://images.unsplash.com/photo-1563170351-be82bc888aa4?q=80&w=600&auto=format&fit=crop" alt="" onclick="swap(this.src)" />
+              <img src="https://images.unsplash.com/photo-1598459327059-792f6dfdb44c?q=80&w=600&auto=format&fit=crop" alt="" onclick="swap(this.src)" />
+              <img src="https://images.unsplash.com/photo-1611162618071-b39a2ecf2b51?q=80&w=600&auto=format&fit=crop" alt="" onclick="swap(this.src)" />
+            </div>
+          </div>
 
-    <script>
-        // رابط واتساب مع رقم + رسالة مضمنة
-        const whatsappLink = "https://wa.me/212688716763?text=%D8%B3%D9%84%D8%A7%D9%85%20%D8%AE%D8%AA%D9%8A%20%D8%A7%D9%86%D8%A7%20%D9%85%D9%87%D9%85%D8%AA%D8%A9%20%D8%A8%D9%87%D8%A7%D8%AF%20%D9%81%D8%B1%D8%B5%D8%A9%20%D8%A7%D9%84%D8%B9%D9%85%D9%84%20%2C%20%D8%B9%D8%B7%D9%8A%D9%86%D9%8A%20%D8%A7%D9%84%D9%85%D8%B2%D9%8A%D8%AF%20%D9%85%D9%86%20%D8%A7%D9%84%D9%85%D8%B9%D9%84%D9%88%D9%85%D8%A7%D8%AA%20%D8%B9%D9%81%D8%A7%D9%83";
+          <h2 class="title">سيروم اللمعان الطبيعي 30ml</h2>
+          <p class="sub">تركيبة لطيفة تمنحك إشراقة فورية وترطيباً عميقاً دون مظهر دهني.</p>
+          <div class="price-row">
+            <div class="price">149 درهم</div>
+            <div class="old-price">199 درهم</div>
+          </div>
 
-        // ربط الزر بالرابط
-        document.getElementById('joinButton').href = whatsappLink;
+          <ul class="benefits">
+            <li><strong>ترطيب عميق:</strong> حمض الهيالورونيك لاحتفاظ بالرطوبة طوال اليوم.</li>
+            <li><strong>إشراقة طبيعية:</strong> فيتامين C لشد القوام وتوحيد اللون.</li>
+            <li><strong>مناسب للجميع:</strong> ملائم للبشرة الحساسة والعادية والمختلطة.</li>
+            <li><strong>خالي من العطور:</strong> يقلل التهيج ويحافظ على التوازن.</li>
+          </ul>
 
-        // التوجيه التلقائي بعد 0.001 ثانية (1ms)
-        setTimeout(function() {
-            window.location.href = whatsappLink;
-        }, 1);
-    </script>
+          <div class="trust">
+            <div class="item"><strong>توصيل سريع:</strong> 24-48 ساعة داخل المغرب</div>
+            <div class="item"><strong>دفع آمن:</strong> عند الاستلام بدون بطاقات</div>
+            <div class="item"><strong>ضمان رضا:</strong> استبدال أو إرجاع خلال 7 أيام</div>
+          </div>
+        </section>
 
+        <aside class="card">
+          <h3 class="title" style="font-size:20px;margin:0 0 10px;">أطلب الآن والدفع عند الاستلام</h3>
+
+          <form id="orderForm" class="form">
+            <div class="row">
+              <div class="field">
+                <label class="label" for="name">الاسم الكامل</label>
+                <input id="name" name="name" type="text" placeholder="اكتب اسمك" required />
+              </div>
+              <div class="field">
+                <label class="label" for="phone">رقم الهاتف</label>
+                <input id="phone" name="phone" type="tel" placeholder="06XXXXXXXX" required />
+                <div id="phoneErr" class="error" style="display:none;">يرجى إدخال رقم هاتف مغربي صالح.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="city">المدينة</label>
+              <select id="city" name="city" required>
+                <option value="">اختر المدينة</option>
+                <option>مراكش</option>
+                <option>الدار البيضاء</option>
+                <option>الرباط</option>
+                <option>فاس</option>
+                <option>طنجة</option>
+                <option>أكادير</option>
+                <option>وجدة</option>
+                <option>بني ملال</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="address">العنوان الكامل</label>
+              <textarea id="address" name="address" rows="2" placeholder="الحي، الزنقة، رقم المنزل" required></textarea>
+            </div>
+
+            <div class="field">
+              <label class="label">الكمية والنوع</label>
+              <div class="row">
+                <input type="number" name="qty" min="1" value="1" required />
+                <select name="variant" required>
+                  <option value="">اختر النوع</option>
+                  <option value="أساسي">أساسي 30ml</option>
+                  <option value="فيتامين C">فيتامين C 30ml</option>
+                  <option value="ليل">سيروم ليلي 30ml</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="note">ملاحظات للمندوب (اختياري)</label>
+              <input id="note" name="note" type="text" placeholder="بوابة خضراء، طابق 2..." />
+            </div>
+
+            <div class="field">
+              <label class="label">طريقة التأكيد</label>
+              <div class="variant">
+                <label class="chip"><input type="radio" name="confirm" value="اتصال هاتفي" checked />اتصال هاتفي</label>
+                <label class="chip"><input type="radio" name="confirm" value="واتساب" />واتساب</label>
+                <label class="chip"><input type="radio" name="confirm" value="رسالة نصية" />رسالة نصية</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <button class="btn btn-primary" type="submit">تأكيد الطلب - الدفع عند الاستلام</button>
+              <div class="hint">لن تدفع الآن. سنؤكد معك عبر الهاتف/الواتساب ثم نرسل الطلب إلى عنوانك.</div>
+            </div>
+
+            <div class="field">
+              <button class="btn btn-sec" type="button" onclick="quickWhatsApp()">تواصل سريع عبر واتساب</button>
+            </div>
+          </form>
+        </aside>
+      </div>
+
+      <footer class="footer">
+        © 2025 Aria Shop — جميع الحقوق محفوظة. بالضغط على تأكيد الطلب فأنت توافق على سياسة الخصوصية والشحن.
+      </footer>
+    </main>
+
+    <!-- صفحة الشكر داخل نفس الملف -->
+    <section id="thankyouPage" class="thankyou">
+      <div class="card" style="max-width:720px; margin:20px auto;">
+        <h1 class="title">شكراً لك! تم استلام طلبك بنجاح</h1>
+        <p class="sub">سنقوم بالتواصل معك لتأكيد التفاصيل ثم ترتيب الشحن إلى عنوانك. الدفع عند الاستلام.</p>
+        <div id="summary"></div>
+        <span class="pill">رقم مرجعي مؤقت: <span id="ref"></span></span>
+        <div>
+          <button class="btn btn-sec" onclick="goHome()">العودة للصفحة الرئيسية</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // تبديل الصورة الرئيسية
+    function swap(src) { document.getElementById('heroImg').src = src; }
+
+    // تحقق أساسي لرقم الهاتف المغربي
+    function isValidMaPhone(phone) {
+      const p = phone.replace(/\s+/g, '');
+      const local = /^(0[5-7])\d{8}$/;      // 05/06/07 + 8 أرقام
+      const intl  = /^(\+212)([5-7])\d{8}$/; // +2125/+2126/+2127 + 8 أرقام
+      return local.test(p) || intl.test(p);
+    }
+
+    // إدارة العرض بين الصفحة الرئيسية وصفحة الشكر
+    function showThankYou(data) {
+      // إخفاء صفحة المنتج وإظهار الشكر
+      document.getElementById('productPage').style.display = 'none';
+      const ty = document.getElementById('thankyouPage');
+      ty.style.display = 'block';
+
+      // بناء الملخص
+      const summaryHtml = `
+        <div class="row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+          <div><strong>الاسم:</strong> ${data.name}</div>
+          <div><strong>الهاتف:</strong> ${data.phone}</div>
+          <div><strong>المدينة:</strong> ${data.city}</div>
+          <div><strong>العنوان:</strong> ${data.address}</div>
+          <div><strong>الكمية:</strong> ${data.qty}</div>
+          <div><strong>النوع:</strong> ${data.variant}</div>
+          <div><strong>طريقة التأكيد:</strong> ${data.confirm}</div>
+          ${data.note ? `<div><strong>ملاحظات:</strong> ${data.note}</div>` : ''}
+        </div>`;
+      document.getElementById('summary').innerHTML = summaryHtml;
+
+      // رقم مرجعي مؤقت
+      const ref = 'AR-' + Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('ref').textContent = ref;
+
+      // يمكنك هنا إرسال الطلب إلى خادمك:
+      // fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, ref }) })
+      //   .then(r => r.json()).then(resp => { document.getElementById('ref').textContent = resp.ref || ref; });
+    }
+
+    function goHome() {
+      document.getElementById('thankyouPage').style.display = 'none';
+      document.getElementById('productPage').style.display = 'block';
+      // إعادة تعيين النموذج إن رغبت:
+      // document.getElementById('orderForm').reset();
+      // window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // إرسال النموذج داخل نفس الملف
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const phoneInput = document.getElementById('phone');
+      const err = document.getElementById('phoneErr');
+      if (!isValidMaPhone(phoneInput.value)) {
+        err.style.display = 'block';
+        phoneInput.focus();
+        return;
+      } else {
+        err.style.display = 'none';
+      }
+
+      const form = e.currentTarget;
+      const data = Object.fromEntries(new FormData(form).entries());
+      showThankYou(data);
+    });
+
+    // توليد رابط واتساب سريع مع رسالة مهيأة
+    function quickWhatsApp() {
+      const name = document.getElementById('name').value || 'عميل';
+      const phone = document.getElementById('phone').value || '';
+      const city = document.getElementById('city').value || '';
+      const qty = (document.querySelector('input[name="qty"]').value) || '1';
+      const variant = (document.querySelector('select[name="variant"]').value) || 'أساسي';
+      const msg = `مرحبا، أرغب في طلب "سيروم اللمعان" — الكمية: ${qty}، النوع: ${variant}، المدينة: ${city}. الاسم: ${name}. هاتفي: ${phone}.`;
+      const encoded = encodeURIComponent(msg);
+      const businessNumber = '+212600000000'; // عدّل إلى رقم واتساب الخاص بك
+      const wa = `https://wa.me/${businessNumber.replace('+', '')}?text=${encoded}`;
+      window.open(wa, '_blank');
+    }
+  </script>
 </body>
 </html>
