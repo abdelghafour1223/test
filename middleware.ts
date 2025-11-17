@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { kv } from '@vercel/kv';
+import { supabase } from './lib/supabase';
 
 /**
  * Bot Detection Middleware
@@ -148,14 +148,24 @@ export async function middleware(request: NextRequest) {
 
     const proxyId = pathSegments[1];
 
-    // Fetch configuration from Vercel KV
-    // Key pattern: proxy:{proxyId}
-    const config = await kv.get<ProxyConfig>(`proxy:${proxyId}`);
+    // Fetch configuration from Supabase
+    const { data, error } = await supabase
+      .from('proxy_configs')
+      .select('*')
+      .eq('id', proxyId)
+      .single();
 
-    if (!config) {
+    if (error || !data) {
       // Configuration not found - proxy doesn't exist
       return new NextResponse('Proxy not found', { status: 404 });
     }
+
+    // Convert database format to ProxyConfig format
+    const config: ProxyConfig = {
+      realUrl: data.real_url,
+      botUrl: data.bot_url,
+      createdAt: new Date(data.created_at).getTime(),
+    };
 
     // Validate configuration
     if (!config.realUrl || !config.botUrl) {

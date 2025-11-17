@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { kv } from '@vercel/kv';
+import { supabase } from '../../../lib/supabase';
 
 /**
  * Proxy configuration interface
@@ -57,16 +57,27 @@ export default async function handler(
       });
     }
 
-    // Fetch configuration from Vercel KV
-    const config = await kv.get<ProxyConfig>(`proxy:${id}`);
+    // Fetch configuration from Supabase
+    const { data, error } = await supabase
+      .from('proxy_configs')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (!config) {
+    if (error || !data) {
       return res.status(404).json({
         success: false,
         error: 'Proxy configuration not found',
         details: `No configuration found for proxy ID: ${id}`,
       });
     }
+
+    // Convert database format to API format
+    const config: ProxyConfig = {
+      realUrl: data.real_url,
+      botUrl: data.bot_url,
+      createdAt: new Date(data.created_at).getTime(),
+    };
 
     // Return configuration (Note: In production, you might want to add
     // authentication to prevent unauthorized access to configurations)
