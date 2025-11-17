@@ -23,6 +23,29 @@ export const TIKTOK_BOT_PATTERNS = [
 ] as const;
 
 /**
+ * ChatGPT and AI bot user-agent patterns
+ * These patterns detect crawlers from ChatGPT, Claude, and other AI services
+ */
+export const CHATGPT_AI_BOT_PATTERNS = [
+  'chatgpt-user',
+  'gptbot',
+  'openai',
+  'claude-web',
+  'anthropic-ai',
+  'anthropic',
+  'perplexitybot',
+  'perplexity',
+  'coherebot',
+  'cohere',
+  'bingbot', // Microsoft's crawler, sometimes used by ChatGPT plugins
+  'google-extended', // Google's AI crawler
+  'omgilibot',
+  'omgili',
+  'facebookexternalhit', // Meta AI crawlers
+  'meta-externalagent',
+] as const;
+
+/**
  * Generic bot patterns (use cautiously to avoid false positives)
  */
 export const GENERIC_BOT_PATTERNS = [
@@ -60,6 +83,14 @@ export const TIKTOK_DOMAINS = [
 export function isTikTokBotUserAgent(userAgent: string): boolean {
   const ua = userAgent.toLowerCase();
   return TIKTOK_BOT_PATTERNS.some(pattern => ua.includes(pattern));
+}
+
+/**
+ * Checks if user-agent matches ChatGPT or AI bot patterns
+ */
+export function isChatGPTBotUserAgent(userAgent: string): boolean {
+  const ua = userAgent.toLowerCase();
+  return CHATGPT_AI_BOT_PATTERNS.some(pattern => ua.includes(pattern));
 }
 
 /**
@@ -122,6 +153,15 @@ export function detectBot(
     return {
       isBot: true,
       reason: 'TikTok referer detected',
+      confidence: 'high',
+    };
+  }
+
+  // High confidence: ChatGPT and AI bot detection
+  if (isChatGPTBotUserAgent(userAgent)) {
+    return {
+      isBot: true,
+      reason: 'ChatGPT/AI bot user-agent detected',
       confidence: 'high',
     };
   }

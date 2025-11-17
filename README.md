@@ -2,7 +2,7 @@
 
 🛡️ **Intelligent serverless proxy for bot detection and redirection**
 
-A sophisticated Vercel-hosted application that acts as an intelligent proxy to protect your website from bot traffic (specifically TikTok bots) while maintaining a seamless experience for legitimate users.
+A sophisticated Vercel-hosted application that acts as an intelligent proxy to protect your website from bot traffic (TikTok bots, ChatGPT, and other AI crawlers) while maintaining a seamless experience for legitimate users.
 
 > 🇲🇦 **دليل النشر بالدارجة المغربية** متوفر في [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
 > **Arabic/Moroccan Darija deployment guide** available in [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
@@ -10,7 +10,8 @@ A sophisticated Vercel-hosted application that acts as an intelligent proxy to p
 ## Features
 
 - ⚡ **Ultra-Fast Detection**: Powered by Vercel Edge Functions (<50ms latency)
-- 🎯 **Smart Bot Detection**: Specifically targets TikTok bots and automated crawlers
+- 🎯 **Smart Bot Detection**: Detects TikTok bots, ChatGPT, Claude, and other AI crawlers
+- 🤖 **AI Bot Support**: Redirects ChatGPT, GPTBot, Claude, Perplexity, and other AI services
 - 🔒 **Stealth Mode**: Silent redirection - bots never know they're detected
 - 🌍 **Global Distribution**: Runs at 100+ edge locations worldwide
 - 📱 **Mobile-First**: Optimized for mobile users
@@ -201,6 +202,12 @@ The middleware analyzes incoming requests and detects bots based on:
 - **User-Agent patterns**: `TikTok`, `ByteSpider`, `Bytedance`, `Musically`
 - **Referer domains**: `tiktok.com`, `musical.ly`, `bytedance.com`, `douyin.com`
 
+#### ChatGPT & AI Bot Detection (High Priority)
+- **ChatGPT/OpenAI**: `ChatGPT-User`, `GPTBot`, `OpenAI`
+- **Claude**: `Claude-Web`, `Anthropic-AI`, `Anthropic`
+- **Perplexity**: `PerplexityBot`, `Perplexity`
+- **Other AI Bots**: `CohereBot`, `Google-Extended`, `BingBot`, `Meta-ExternalAgent`
+
 #### Generic Bot Detection
 - Common bot user-agents: `curl`, `wget`, `python-requests`, `scrapy`
 - Headless browser signatures: Missing standard HTTP headers
@@ -208,11 +215,40 @@ The middleware analyzes incoming requests and detects bots based on:
 
 #### Detection Logic
 ```typescript
-if (TikTok bot detected) {
+if (TikTok bot detected || ChatGPT/AI bot detected) {
   → Redirect to Bot URL (decoy)
 } else if (legitimate user) {
   → Redirect to Real URL
 }
+```
+
+### Testing with ChatGPT & AI Bots
+
+To test if the bot detection is working with ChatGPT:
+
+1. Deploy your proxy to Vercel
+2. Set `BOT_URL` to a fake/decoy website with dummy content
+3. Set `REAL_URL` to your actual website
+4. Share your Vercel deployment URL with a ChatGPT bot
+5. Ask the bot: "Can you visit this link and tell me what you see?"
+6. If the bot returns content from your `BOT_URL` (decoy site), detection is working! ✅
+
+**Example conversation with ChatGPT:**
+```
+You: "Can you visit https://your-app.vercel.app and tell me what content is there?"
+ChatGPT: [Returns content from BOT_URL instead of REAL_URL]
+Result: Bot detection is working! ✅
+```
+
+**Testing with curl (simulating AI bot):**
+```bash
+# Test ChatGPT bot detection
+curl -H "User-Agent: ChatGPT-User" https://your-app.vercel.app
+# Should redirect to BOT_URL
+
+# Test as normal user
+curl -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" https://your-app.vercel.app
+# Should redirect to REAL_URL
 ```
 
 ### URL Preservation

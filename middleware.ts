@@ -14,11 +14,11 @@ const REAL_URL = process.env.REAL_URL;
 const BOT_URL = process.env.BOT_URL;
 
 /**
- * Detects if the request is from a TikTok bot
+ * Detects if the request is from a bot (TikTok, ChatGPT, or other AI bots)
  * @param request - The incoming Next.js request
  * @returns true if bot detected, false otherwise
  */
-function detectTikTokBot(request: NextRequest): boolean {
+function detectBot(request: NextRequest): boolean {
   const userAgent = request.headers.get('user-agent')?.toLowerCase() || '';
   const referer = request.headers.get('referer')?.toLowerCase() || '';
 
@@ -32,8 +32,33 @@ function detectTikTokBot(request: NextRequest): boolean {
     'trill', // TikTok's previous name in some regions
   ];
 
+  // ChatGPT and AI bot patterns
+  const chatGPTAIBotPatterns = [
+    'chatgpt-user',
+    'gptbot',
+    'openai',
+    'claude-web',
+    'anthropic-ai',
+    'anthropic',
+    'perplexitybot',
+    'perplexity',
+    'coherebot',
+    'cohere',
+    'bingbot',
+    'google-extended',
+    'omgilibot',
+    'omgili',
+    'facebookexternalhit',
+    'meta-externalagent',
+  ];
+
   // Check if user-agent contains any TikTok bot patterns
   const isTikTokUserAgent = tikTokBotPatterns.some(pattern =>
+    userAgent.includes(pattern)
+  );
+
+  // Check if user-agent contains any ChatGPT/AI bot patterns
+  const isChatGPTAIUserAgent = chatGPTAIBotPatterns.some(pattern =>
     userAgent.includes(pattern)
   );
 
@@ -72,10 +97,14 @@ function detectTikTokBot(request: NextRequest): boolean {
   // Suspicious if missing multiple standard browser headers
   const suspiciousHeaders = !hasAcceptLanguage && !hasAcceptEncoding;
 
-  // Decision logic: Prioritize TikTok-specific detection
+  // Decision logic: Prioritize TikTok and ChatGPT/AI bot detection
   // Then consider generic bot patterns combined with missing headers
   if (isTikTokUserAgent || isTikTokReferer) {
     return true; // Definitely a TikTok bot
+  }
+
+  if (isChatGPTAIUserAgent) {
+    return true; // Definitely a ChatGPT/AI bot
   }
 
   // Generic bot with missing headers is likely automated
@@ -258,8 +287,8 @@ export async function middleware(request: NextRequest) {
       });
     }
 
-    // Run bot detection
-    const isBot = detectTikTokBot(request);
+    // Run bot detection (TikTok, ChatGPT, and other AI bots)
+    const isBot = detectBot(request);
 
     // Build redirect URL with preserved path and query parameters
     const targetUrl = isBot ? BOT_URL : REAL_URL;
