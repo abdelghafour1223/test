@@ -1,8 +1,8 @@
-# Vercel Bot Proxy
+# TikTok Bot Detection & Redirection Tool
 
-🛡️ **Intelligent serverless proxy for bot detection and redirection**
+🛡️ **Intelligent TikTok bot detection with 301 permanent redirection**
 
-A sophisticated Vercel-hosted application that acts as an intelligent proxy to protect your website from bot traffic (TikTok bots, ChatGPT, and other AI crawlers) while maintaining a seamless experience for legitimate users.
+A sophisticated Vercel Edge middleware that intelligently routes TikTok bot crawlers (Bytespider, TikTokSpider) to a fake URL while ensuring legitimate human users—including those browsing via TikTok's in-app browser (WebView)—access your real content seamlessly.
 
 > 🇲🇦 **دليل النشر بالدارجة المغربية** متوفر في [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
 > **Arabic/Moroccan Darija deployment guide** available in [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
@@ -10,37 +10,45 @@ A sophisticated Vercel-hosted application that acts as an intelligent proxy to p
 ## Features
 
 - ⚡ **Ultra-Fast Detection**: Powered by Vercel Edge Functions (<50ms latency)
-- 🎯 **Smart Bot Detection**: Detects TikTok bots, ChatGPT, Claude, and other AI crawlers
-- 🤖 **AI Bot Support**: Redirects ChatGPT, GPTBot, Claude, Perplexity, and other AI services
-- 🔒 **Stealth Mode**: Silent redirection - bots never know they're detected
+- 🎯 **Precise TikTok Bot Detection**: Targets only Bytespider and TikTokSpider crawlers
+- 👥 **Human-Friendly**: Preserves access for TikTok WebView users (trill, musical_ly, BytedanceWebview)
+- 🔀 **301 Permanent Redirect**: SEO-optimized redirection (bots update their index with fake URL)
 - 🌍 **Global Distribution**: Runs at 100+ edge locations worldwide
-- 📱 **Mobile-First**: Optimized for mobile users
+- 📱 **Mobile-First**: Optimized for TikTok in-app browser and mobile users
 - 🚀 **Serverless**: Zero infrastructure management, auto-scaling
-- 🔐 **Secure**: Unique proxy IDs using cryptographically secure random generation
+- 🧪 **Comprehensive Testing**: Includes test suite to validate bot detection
+- 📊 **Debug Headers**: X-Bot-Detection header for easy troubleshooting
 
 ## How It Works
 
 ```
 ┌─────────────────┐
-│ Incoming Traffic│
+│ Incoming Request│
 └────────┬────────┘
          │
          ▼
-┌────────────────────┐
-│  Edge Middleware   │◄─── Bot Detection Logic
-│  (Global CDN)      │
-└────────┬───────────┘
+   [User-Agent Check]
          │
     ┌────┴────┐
     │         │
-Bot Detected  Legitimate User
-    │         │
     ▼         ▼
-┌────────┐ ┌──────────┐
-│ Decoy  │ │   Real   │
-│  Site  │ │ Website  │
-└────────┘ └──────────┘
+TikTok      TikTok Bot?
+WebView?   (Bytespider/
+(Human)    TikTokSpider)
+    │         │
+    │ YES     │ YES
+    ▼         ▼
+┌─────────┐ ┌─────────┐
+│ REAL    │ │  FAKE   │
+│  URL    │ │  URL    │
+│ (301)   │ │ (301)   │
+└─────────┘ └─────────┘
 ```
+
+**Key Logic:**
+1. ✅ TikTok WebView (trill, musical_ly, BytedanceWebview) → HUMAN → Real URL
+2. ✅ Bytespider or TikTokSpider → BOT → Fake URL
+3. ✅ All other traffic → HUMAN → Real URL
 
 ## Tech Stack
 
@@ -196,60 +204,42 @@ BOT_URL=https://your-decoy-website.com
 
 ### How Bot Detection Works
 
-The middleware analyzes incoming requests and detects bots based on:
+The middleware uses a precise, priority-based detection system:
 
-#### TikTok Bot Detection (High Priority)
-- **User-Agent patterns**: `TikTok`, `ByteSpider`, `Bytedance`, `Musically`
-- **Referer domains**: `tiktok.com`, `musical.ly`, `bytedance.com`, `douyin.com`
+#### Priority 1: Identify Legitimate Humans (TikTok WebView)
+**CRITICAL**: Users browsing via TikTok's in-app browser are real humans.
 
-#### ChatGPT & AI Bot Detection (High Priority)
-- **ChatGPT/OpenAI**: `ChatGPT-User`, `GPTBot`, `OpenAI`
-- **Claude**: `Claude-Web`, `Anthropic-AI`, `Anthropic`
-- **Perplexity**: `PerplexityBot`, `Perplexity`
-- **Other AI Bots**: `CohereBot`, `Google-Extended`, `BingBot`, `Meta-ExternalAgent`
+**TikTok WebView Identifiers:**
+- `trill` - TikTok WebView identifier
+- `musical_ly` - TikTok WebView identifier
+- `BytedanceWebview` - TikTok WebView identifier
+- `JsSdk/1.0` or `JsSdk/2.0` - TikTok WebView SDK
 
-#### Generic Bot Detection
-- Common bot user-agents: `curl`, `wget`, `python-requests`, `scrapy`
-- Headless browser signatures: Missing standard HTTP headers
-- Automated tool patterns
+**These users are NEVER redirected to fake content.**
+
+#### Priority 2: Identify TikTok Bots (Crawlers Only)
+**User-Agent patterns treated as bots:**
+- `Bytespider` - AI data scraper for LLM training
+- `TikTokSpider` - Link preview fetcher
+
+**These bots are redirected to the fake URL with HTTP 301.**
+
+#### Priority 3: All Other Traffic
+Any traffic that doesn't match the above patterns is treated as legitimate and redirected to the real URL.
 
 #### Detection Logic
 ```typescript
-if (TikTok bot detected || ChatGPT/AI bot detected) {
-  → Redirect to Bot URL (decoy)
-} else if (legitimate user) {
-  → Redirect to Real URL
+if (TikTok WebView detected) {
+  → HUMAN → Real URL (301)
+} else if (Bytespider or TikTokSpider detected) {
+  → BOT → Fake URL (301)
+} else {
+  → HUMAN → Real URL (301)
 }
 ```
 
-### Testing with ChatGPT & AI Bots
+**Note:** This implementation focuses specifically on TikTok bot detection. Generic bot detection and ChatGPT/AI bot detection have been removed to prevent false positives.
 
-To test if the bot detection is working with ChatGPT:
-
-1. Deploy your proxy to Vercel
-2. Set `BOT_URL` to a fake/decoy website with dummy content
-3. Set `REAL_URL` to your actual website
-4. Share your Vercel deployment URL with a ChatGPT bot
-5. Ask the bot: "Can you visit this link and tell me what you see?"
-6. If the bot returns content from your `BOT_URL` (decoy site), detection is working! ✅
-
-**Example conversation with ChatGPT:**
-```
-You: "Can you visit https://your-app.vercel.app and tell me what content is there?"
-ChatGPT: [Returns content from BOT_URL instead of REAL_URL]
-Result: Bot detection is working! ✅
-```
-
-**Testing with curl (simulating AI bot):**
-```bash
-# Test ChatGPT bot detection
-curl -H "User-Agent: ChatGPT-User" https://your-app.vercel.app
-# Should redirect to BOT_URL
-
-# Test as normal user
-curl -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" https://your-app.vercel.app
-# Should redirect to REAL_URL
-```
 
 ### URL Preservation
 
@@ -265,9 +255,47 @@ Deployment URL: https://your-app.vercel.app/products?id=5
 Real URL:       https://your-site.com/products?id=5
 ```
 
-## Architecture
+## Architecture & Documentation
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture and data flow diagrams.
+- **[TIKTOK_BOT_DETECTION.md](./TIKTOK_BOT_DETECTION.md)** - Comprehensive guide to TikTok bot detection logic, testing, and troubleshooting
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Detailed system architecture and data flow diagrams
+- **[test-bot-detection.sh](./test-bot-detection.sh)** - Automated test suite for validating bot detection
+
+## Testing
+
+### Quick Test
+
+Run the comprehensive test suite:
+
+```bash
+# Test local development
+./test-bot-detection.sh http://localhost:3000
+
+# Test production
+./test-bot-detection.sh https://your-app.vercel.app
+```
+
+### Manual Testing
+
+**Test TikTok Bot (should redirect to FAKE URL):**
+```bash
+curl -I -A "Mozilla/5.0 (compatible; Bytespider; spider-feedback@bytedance.com)" https://your-app.vercel.app
+# Expected: HTTP 301 → https://storelhata.com/pages/miroir
+```
+
+**Test TikTok WebView (should redirect to REAL URL):**
+```bash
+curl -I -A "Mozilla/5.0 (Linux; Android 8.1.0) AppleWebKit/537.36 trill_200005 JsSdk/1.0" https://your-app.vercel.app
+# Expected: HTTP 301 → https://ecoshopin.store/products/...
+```
+
+**Test Regular Browser (should redirect to REAL URL):**
+```bash
+curl -I -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0" https://your-app.vercel.app
+# Expected: HTTP 301 → https://ecoshopin.store/products/...
+```
+
+See [TIKTOK_BOT_DETECTION.md](./TIKTOK_BOT_DETECTION.md) for comprehensive testing documentation.
 
 ## Configuration
 
