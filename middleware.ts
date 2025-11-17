@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { supabase } from './lib/supabase';
 
 /**
  * Bot Detection Middleware
  * Runs at the Edge for ultra-fast bot detection and redirection
- * This middleware intercepts all requests to /p/* paths and redirects based on bot detection
+ * This middleware intercepts all requests and redirects based on bot detection
+ *
+ * Uses static configuration from environment variables (single-user setup)
  */
 
-// Configuration interface for proxy settings
-interface ProxyConfig {
-  realUrl: string;
-  botUrl: string;
-  createdAt: number;
-}
+// Static configuration from environment variables
+const REAL_URL = process.env.REAL_URL;
+const BOT_URL = process.env.BOT_URL;
 
 /**
  * Detects if the request is from a TikTok bot
@@ -130,53 +128,18 @@ function buildRedirectUrl(baseUrl: string, request: NextRequest): string {
  * Main middleware function
  */
 export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-
-  // Only process requests to proxy URLs (/p/*)
-  if (!pathname.startsWith('/p/')) {
-    return NextResponse.next();
-  }
-
   try {
-    // Extract proxy ID from path: /p/{proxyId}
-    const pathSegments = pathname.split('/').filter(Boolean);
-
-    if (pathSegments.length < 2 || pathSegments[0] !== 'p') {
-      // Invalid proxy URL format
-      return new NextResponse('Invalid proxy URL', { status: 400 });
-    }
-
-    const proxyId = pathSegments[1];
-
-    // Fetch configuration from Supabase
-    const { data, error } = await supabase
-      .from('proxy_configs')
-      .select('*')
-      .eq('id', proxyId)
-      .single();
-
-    if (error || !data) {
-      // Configuration not found - proxy doesn't exist
-      return new NextResponse('Proxy not found', { status: 404 });
-    }
-
-    // Convert database format to ProxyConfig format
-    const config: ProxyConfig = {
-      realUrl: data.real_url,
-      botUrl: data.bot_url,
-      createdAt: new Date(data.created_at).getTime(),
-    };
-
-    // Validate configuration
-    if (!config.realUrl || !config.botUrl) {
-      return new NextResponse('Invalid proxy configuration', { status: 500 });
+    // Validate static configuration
+    if (!REAL_URL || !BOT_URL) {
+      console.error('Missing environment variables: REAL_URL and BOT_URL must be set');
+      return new NextResponse('Proxy service not configured', { status: 500 });
     }
 
     // Run bot detection
     const isBot = detectTikTokBot(request);
 
     // Build redirect URL with preserved path and query parameters
-    const targetUrl = isBot ? config.botUrl : config.realUrl;
+    const targetUrl = isBot ? BOT_URL : REAL_URL;
     const redirectUrl = buildRedirectUrl(targetUrl, request);
 
     // Perform redirect (302 = temporary redirect, appropriate for proxying)
@@ -205,8 +168,18 @@ export async function middleware(request: NextRequest) {
 
 /**
  * Middleware configuration
- * Only run middleware on /p/* paths for efficiency
+ * Run middleware on all paths except static files and API routes
  */
 export const config = {
-  matcher: '/p/:path*',
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - admin (admin dashboard)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|admin).*)',
+  ],
 };
