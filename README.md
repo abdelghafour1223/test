@@ -1,8 +1,8 @@
-# TikTok Bot Detection & Redirection Tool
+# TikTok Bot Detection & Server-Side Rendering Tool
 
-🛡️ **Intelligent TikTok bot detection with 301 permanent redirection**
+🛡️ **Intelligent TikTok bot detection with server-side content rendering (no redirects)**
 
-A sophisticated Vercel Edge middleware that intelligently routes TikTok bot crawlers (Bytespider, TikTokSpider) to a fake URL while ensuring legitimate human users—including those browsing via TikTok's in-app browser (WebView)—access your real content seamlessly.
+A sophisticated Vercel Edge middleware that uses reverse proxy to serve different content to TikTok bots (Bytespider, TikTokSpider) and legitimate human users—including those browsing via TikTok's in-app browser (WebView)—while keeping the same URL visible in the browser.
 
 > 🇲🇦 **دليل النشر بالدارجة المغربية** متوفر في [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
 > **Arabic/Moroccan Darija deployment guide** available in [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
@@ -12,22 +12,26 @@ A sophisticated Vercel Edge middleware that intelligently routes TikTok bot craw
 - ⚡ **Ultra-Fast Detection**: Powered by Vercel Edge Functions (<50ms latency)
 - 🎯 **Precise TikTok Bot Detection**: Targets only Bytespider and TikTokSpider crawlers
 - 👥 **Human-Friendly**: Preserves access for TikTok WebView users (trill, musical_ly, BytedanceWebview)
-- 🔀 **301 Permanent Redirect**: SEO-optimized redirection (bots update their index with fake URL)
+- 🔄 **Server-Side Rendering (SSR)**: Reverse proxy serves different content without URL changes
+- 🎭 **Stealth Mode**: Same URL shows different content to bots vs humans
 - 🌍 **Global Distribution**: Runs at 100+ edge locations worldwide
 - 📱 **Mobile-First**: Optimized for TikTok in-app browser and mobile users
 - 🚀 **Serverless**: Zero infrastructure management, auto-scaling
 - 🧪 **Comprehensive Testing**: Includes test suite to validate bot detection
-- 📊 **Debug Headers**: X-Bot-Detection header for easy troubleshooting
+- 📊 **Debug Headers**: X-Bot-Detection, X-Proxy-Target, X-Render-Mode headers
 
 ## How It Works
 
 ```
 ┌─────────────────┐
 │ Incoming Request│
+│ (same URL for  │
+│  bots & humans) │
 └────────┬────────┘
          │
          ▼
    [User-Agent Check]
+   (Edge Middleware)
          │
     ┌────┴────┐
     │         │
@@ -39,16 +43,26 @@ WebView?   (Bytespider/
     │ YES     │ YES
     ▼         ▼
 ┌─────────┐ ┌─────────┐
-│ REAL    │ │  FAKE   │
-│  URL    │ │  URL    │
-│ (301)   │ │ (301)   │
-└─────────┘ └─────────┘
+│ Fetch   │ │ Fetch   │
+│ REAL    │ │ FAKE    │
+│ Content │ │ Content │
+└────┬────┘ └────┬────┘
+     │           │
+     └─────┬─────┘
+           ▼
+   ┌──────────────┐
+   │ Serve Content│
+   │ (SSR - same  │
+   │  URL in      │
+   │  browser)    │
+   └──────────────┘
 ```
 
 **Key Logic:**
-1. ✅ TikTok WebView (trill, musical_ly, BytedanceWebview) → HUMAN → Real URL
-2. ✅ Bytespider or TikTokSpider → BOT → Fake URL
-3. ✅ All other traffic → HUMAN → Real URL
+1. ✅ TikTok WebView (trill, musical_ly, BytedanceWebview) → HUMAN → Serve Real Content
+2. ✅ Bytespider or TikTokSpider → BOT → Serve Fake Content
+3. ✅ All other traffic → HUMAN → Serve Real Content
+4. ✅ **URL never changes** - server-side rendering only
 
 ## Tech Stack
 
@@ -230,15 +244,17 @@ Any traffic that doesn't match the above patterns is treated as legitimate and r
 #### Detection Logic
 ```typescript
 if (TikTok WebView detected) {
-  → HUMAN → Real URL (301)
+  → HUMAN → Fetch and serve Real Content (SSR)
 } else if (Bytespider or TikTokSpider detected) {
-  → BOT → Fake URL (301)
+  → BOT → Fetch and serve Fake Content (SSR)
 } else {
-  → HUMAN → Real URL (301)
+  → HUMAN → Fetch and serve Real Content (SSR)
 }
 ```
 
 **Note:** This implementation focuses specifically on TikTok bot detection. Generic bot detection and ChatGPT/AI bot detection have been removed to prevent false positives.
+
+**SSR Behavior:** The middleware acts as a reverse proxy, fetching content from the target URL and serving it directly. The URL in the browser never changes - bots and humans see the same URL but receive different content.
 
 
 ### URL Preservation
@@ -277,22 +293,31 @@ Run the comprehensive test suite:
 
 ### Manual Testing
 
-**Test TikTok Bot (should redirect to FAKE URL):**
+**Test TikTok Bot (should serve FAKE content via SSR):**
 ```bash
 curl -I -A "Mozilla/5.0 (compatible; Bytespider; spider-feedback@bytedance.com)" https://your-app.vercel.app
-# Expected: HTTP 301 → https://storelhata.com/pages/miroir
+# Expected: HTTP 200, X-Bot-Detection: bot, X-Proxy-Target: fake-url
 ```
 
-**Test TikTok WebView (should redirect to REAL URL):**
+**Test TikTok WebView (should serve REAL content via SSR):**
 ```bash
 curl -I -A "Mozilla/5.0 (Linux; Android 8.1.0) AppleWebKit/537.36 trill_200005 JsSdk/1.0" https://your-app.vercel.app
-# Expected: HTTP 301 → https://ecoshopin.store/products/...
+# Expected: HTTP 200, X-Bot-Detection: human, X-Proxy-Target: real-url
 ```
 
-**Test Regular Browser (should redirect to REAL URL):**
+**Test Regular Browser (should serve REAL content via SSR):**
 ```bash
 curl -I -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0" https://your-app.vercel.app
-# Expected: HTTP 301 → https://ecoshopin.store/products/...
+# Expected: HTTP 200, X-Bot-Detection: human, X-Proxy-Target: real-url
+```
+
+**View actual content (not just headers):**
+```bash
+# Bot sees fake content
+curl -A "Mozilla/5.0 (compatible; Bytespider)" https://your-app.vercel.app | head -20
+
+# Human sees real content
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0" https://your-app.vercel.app | head -20
 ```
 
 See [TIKTOK_BOT_DETECTION.md](./TIKTOK_BOT_DETECTION.md) for comprehensive testing documentation.

@@ -1,18 +1,20 @@
-# TikTok Bot Detection and Redirection
+# TikTok Bot Detection and Server-Side Rendering
 
 ## Overview
 
-This tool implements intelligent traffic routing to differentiate between TikTok bot crawlers and legitimate human users, including those browsing via TikTok's in-app browser (WebView).
+This tool implements intelligent server-side content rendering to differentiate between TikTok bot crawlers and legitimate human users, including those browsing via TikTok's in-app browser (WebView). Using reverse proxy technology, it serves different content to bots and humans while keeping the same URL visible in the browser.
 
 ## How It Works
 
 ```
 ┌─────────────────┐
 │ Incoming Request│
+│ (same URL)      │
 └────────┬────────┘
          │
          ▼
    [User-Agent Check]
+   (Edge Middleware)
          │
     ┌────┴────┐
     │         │
@@ -29,8 +31,17 @@ JsSdk)
 └──┬──┘   └──┬──┘
    │         │
    ▼         ▼
-REAL URL  FAKE URL
-(301)     (301)
+Fetch     Fetch
+REAL      FAKE
+Content   Content
+   │         │
+   └────┬────┘
+        ▼
+    ┌────────┐
+    │ Serve  │
+    │Content │
+    │ (SSR)  │
+    └────────┘
 ```
 
 ## Detection Logic
@@ -87,26 +98,35 @@ Any traffic that doesn't match the above patterns is treated as legitimate human
 ```
 https://storelhata.com/pages/miroir
 ```
-- TikTok bots (Bytespider and TikTokSpider) are redirected here with HTTP 301 Permanent Redirect
-- This tells bots to update their index with the fake URL
+- Content from this URL is fetched and served to TikTok bots (Bytespider and TikTokSpider)
+- Served via reverse proxy (server-side rendering)
+- Bot sees fake content but URL stays the same (your deployment URL)
 
 ### Real URL (for Humans)
 ```
 https://ecoshopin.store/products/propolis-%D8%A7%D9%84%D8%A3%D8%B5%D9%84%D9%8A-%D8%A3%D9%82%D9%88%D9%89-%D9%85%D9%83%D9%85%D9%84-%D8%B7%D8%A8%D9%8A%D8%B9%D9%8A-%D9%83%D9%8A%D8%AD%D9%85%D9%8A-%D9%85%D9%86%D8%A7%D8%B9%D8%AA%D9%83-%D9%88%D9%8A%D8%B9%D8%B7%D9%8A%D9%83-%D9%85%D9%86-%D8%A7%D9%84%D9%82%D9%88%D9%85%D9%86-%D8%A7%D9%84%D8%AF%D8%A7%D8%AE%D9%84-%F0%9F%90%9D%E2%9C%A8
 ```
-- Legitimate human users (including TikTok WebView) are redirected here
-- HTTP 301 Permanent Redirect
+- Content from this URL is fetched and served to legitimate human users (including TikTok WebView)
+- Served via reverse proxy (server-side rendering)
+- User sees real content but URL stays the same (your deployment URL)
 
 ## Technical Implementation
 
-### Redirection Method: HTTP 301 Permanent Redirect
+### Rendering Method: Server-Side Rendering (Reverse Proxy)
 
-**Why 301 instead of reverse proxy?**
-- ✅ More efficient - no content fetching required
-- ✅ Lower latency - simple redirect vs fetch + serve
-- ✅ SEO-friendly - bots update their index with the target URL
-- ✅ Simpler implementation - less code, fewer failure points
-- ✅ Lower cost - reduced edge function execution time
+**Why SSR instead of redirect?**
+- ✅ **Stealth** - Same URL for bots and humans (no visible redirect)
+- ✅ **Control** - Bots can't see the real URL, only the deployment URL
+- ✅ **Seamless** - Users/bots don't experience navigation changes
+- ✅ **Flexible** - Can modify content on-the-fly if needed
+- ✅ **Deceptive** - Bots index your deployment URL but get fake content
+
+**How It Works:**
+1. Request arrives at Vercel Edge (your-app.vercel.app)
+2. Middleware detects User-Agent type (bot vs human)
+3. Middleware fetches content from target URL (fake or real)
+4. Middleware serves fetched content with HTTP 200
+5. Browser/bot URL stays as your-app.vercel.app (never changes)
 
 ### Edge Middleware Benefits
 
@@ -161,28 +181,37 @@ The test script validates:
 
 ### Manual Testing with cURL
 
-**Test Bytespider (should redirect to FAKE URL):**
+**Test Bytespider (should serve FAKE content via SSR):**
 ```bash
 curl -I -A "Mozilla/5.0 (compatible; Bytespider; spider-feedback@bytedance.com)" https://your-app.vercel.app
-# Expected: HTTP 301, Location: https://storelhata.com/pages/miroir
+# Expected: HTTP 200, X-Bot-Detection: bot, X-Proxy-Target: fake-url, X-Render-Mode: server-side
 ```
 
-**Test TikTokSpider (should redirect to FAKE URL):**
+**Test TikTokSpider (should serve FAKE content via SSR):**
 ```bash
 curl -I -A "Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; TikTokSpider; ttspider-feedback@tiktok.com)" https://your-app.vercel.app
-# Expected: HTTP 301, Location: https://storelhata.com/pages/miroir
+# Expected: HTTP 200, X-Bot-Detection: bot, X-Proxy-Target: fake-url, X-Render-Mode: server-side
 ```
 
-**Test TikTok WebView (should redirect to REAL URL):**
+**Test TikTok WebView (should serve REAL content via SSR):**
 ```bash
 curl -I -A "Mozilla/5.0 (Linux; Android 8.1.0) AppleWebKit/537.36 Chrome/91.0.4472.120 Mobile Safari/537.36 trill_200005 JsSdk/1.0" https://your-app.vercel.app
-# Expected: HTTP 301, Location: https://ecoshopin.store/products/...
+# Expected: HTTP 200, X-Bot-Detection: human, X-Proxy-Target: real-url, X-Render-Mode: server-side
 ```
 
-**Test Regular Browser (should redirect to REAL URL):**
+**Test Regular Browser (should serve REAL content via SSR):**
 ```bash
 curl -I -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" https://your-app.vercel.app
-# Expected: HTTP 301, Location: https://ecoshopin.store/products/...
+# Expected: HTTP 200, X-Bot-Detection: human, X-Proxy-Target: real-url, X-Render-Mode: server-side
+```
+
+**View actual content (not just headers):**
+```bash
+# Bot sees fake content from storelhata.com
+curl -A "Mozilla/5.0 (compatible; Bytespider)" https://your-app.vercel.app
+
+# Human sees real content from ecoshopin.store
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0" https://your-app.vercel.app
 ```
 
 ### Browser Developer Tools Testing
@@ -212,16 +241,19 @@ In development mode (`NODE_ENV=development`), the middleware logs each request:
 
 ### Response Headers
 
-The middleware adds a custom header for debugging:
+The middleware adds custom headers for debugging:
 
 ```
-X-Bot-Detection: bot       # Redirected to fake URL
-X-Bot-Detection: human     # Redirected to real URL
+X-Bot-Detection: bot               # Served fake content
+X-Bot-Detection: human             # Served real content
+X-Proxy-Target: fake-url           # Content from fake URL
+X-Proxy-Target: real-url           # Content from real URL
+X-Render-Mode: server-side         # SSR confirmation
 ```
 
-Check this header with cURL:
+Check these headers with cURL:
 ```bash
-curl -I -A "<user-agent>" https://your-app.vercel.app | grep "X-Bot-Detection"
+curl -I -A "<user-agent>" https://your-app.vercel.app | grep "X-"
 ```
 
 ## Performance
@@ -296,13 +328,14 @@ curl -I -A "<user-agent>" https://your-app.vercel.app | grep "X-Bot-Detection"
 2. Ensure WebView check happens BEFORE bot check
 3. Test locally with the test script
 
-### Issue: 301 redirects being cached
+### Issue: Content not updating
 
-**Cause:** Browser caching 301 redirects
+**Cause:** Browser or CDN caching proxied content
 
 **Solution:**
 - Clear browser cache
 - Use incognito/private browsing mode
+- Check Cache-Control headers (should be no-cache)
 - Add cache-busting query parameters: `?test=1234`
 
 ## Source Attribution
