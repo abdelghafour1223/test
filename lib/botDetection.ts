@@ -25,12 +25,16 @@ export const TIKTOK_BOT_PATTERNS = [
 /**
  * ChatGPT and AI bot user-agent patterns
  * These patterns detect crawlers from ChatGPT, Claude, and other AI services
+ * Expanded to catch more variants and edge cases
  */
 export const CHATGPT_AI_BOT_PATTERNS = [
   'chatgpt-user',
+  'chatgpt',
   'gptbot',
   'openai',
+  'openai-bot',
   'claude-web',
+  'claude',
   'anthropic-ai',
   'anthropic',
   'perplexitybot',
@@ -38,11 +42,18 @@ export const CHATGPT_AI_BOT_PATTERNS = [
   'coherebot',
   'cohere',
   'bingbot', // Microsoft's crawler, sometimes used by ChatGPT plugins
+  'bingpreview',
   'google-extended', // Google's AI crawler
+  'googlebot',
   'omgilibot',
   'omgili',
   'facebookexternalhit', // Meta AI crawlers
+  'facebookbot',
   'meta-externalagent',
+  'meta-externalfetcher',
+  'oai-searchbot', // OpenAI's search bot
+  'dataforseo', // Data scraping service often used by AI
+  'applebot', // Sometimes used by AI services
 ] as const;
 
 /**

