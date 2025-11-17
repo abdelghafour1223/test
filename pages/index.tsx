@@ -79,9 +79,9 @@ export default function Home() {
                   1
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-1">Configure Your URLs</h4>
+                  <h4 className="font-semibold text-gray-900 mb-1">Configure Environment Variables</h4>
                   <p className="text-gray-600">
-                    Enter your real website URL (for legitimate users) and a decoy URL (for bots).
+                    Set REAL_URL (for legitimate users) and BOT_URL (decoy for bots) in your deployment settings.
                   </p>
                 </div>
               </div>
@@ -92,9 +92,9 @@ export default function Home() {
                   2
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-1">Get Your Proxy URL</h4>
+                  <h4 className="font-semibold text-gray-900 mb-1">Deploy to Vercel</h4>
                   <p className="text-gray-600">
-                    Receive a unique, secure proxy URL to share instead of your real website.
+                    Deploy the application and use your deployment URL as the proxy link to share.
                   </p>
                 </div>
               </div>
@@ -149,8 +149,8 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                 </svg>
                 <div>
-                  <h4 className="font-semibold mb-1">Vercel KV Storage</h4>
-                  <p className="text-gray-300 text-sm">Redis-compatible, edge-cached configuration</p>
+                  <h4 className="font-semibold mb-1">Static Configuration</h4>
+                  <p className="text-gray-300 text-sm">Environment-based setup for single-user deployment</p>
                 </div>
               </div>
 

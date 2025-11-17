@@ -41,8 +41,8 @@ Bot Detected  Legitimate User
 ## Tech Stack
 
 - **Framework**: Next.js 14 (TypeScript)
-- **Runtime**: Vercel Edge Runtime + Node.js
-- **Storage**: Vercel KV (Redis)
+- **Runtime**: Vercel Edge Runtime
+- **Configuration**: Static environment variables (single-user setup)
 - **Styling**: Tailwind CSS
 - **Deployment**: Vercel Platform
 
@@ -67,25 +67,17 @@ cd vercel-bot-proxy
 npm install
 ```
 
-### 3. Set Up Vercel KV (Local Development)
+### 3. Set Up Environment Variables
 
-For local development, you'll need to link your project to Vercel:
+Create a `.env.local` file in the project root:
 
 ```bash
-# Install Vercel CLI globally
-npm install -g vercel
-
-# Login to Vercel
-vercel login
-
-# Link your project
-vercel link
-
-# Pull environment variables (including KV credentials)
-vercel env pull .env.local
+# Static Proxy Configuration
+REAL_URL=https://your-real-website.com
+BOT_URL=https://your-decoy-website.com
 ```
 
-This will create a `.env.local` file with your Vercel KV credentials.
+Replace the URLs with your actual website URLs.
 
 ### 4. Run Development Server
 
@@ -124,21 +116,21 @@ vercel
 vercel --prod
 ```
 
-#### Step 4: Set Up Vercel KV
+#### Step 4: Set Environment Variables
 
-After deployment, you need to add Vercel KV storage:
+Set your environment variables in Vercel:
 
 1. Go to your Vercel Dashboard: https://vercel.com/dashboard
 2. Select your project
-3. Go to **Storage** tab
-4. Click **Create Database**
-5. Select **KV** (Redis-compatible)
-6. Click **Create**
-7. Vercel will automatically add the KV environment variables to your project
+3. Go to **Settings** → **Environment Variables**
+4. Add the following variables:
+   - `REAL_URL`: Your real website URL (e.g., `https://your-main-site.com`)
+   - `BOT_URL`: Your decoy website URL (e.g., `https://decoy-site.com`)
+5. Make sure to set them for **Production**, **Preview**, and **Development** environments
 
 #### Step 5: Redeploy
 
-After adding KV, trigger a redeployment:
+After adding environment variables, trigger a redeployment:
 
 ```bash
 vercel --prod
@@ -165,37 +157,38 @@ git push -u origin main
 4. Vercel will auto-detect Next.js and configure build settings
 5. Click **Deploy**
 
-#### Step 3: Add Vercel KV
+#### Step 3: Set Environment Variables
 
-Follow the same KV setup steps as Method 1 (Step 4).
+Follow the same environment variable setup steps as Method 1 (Step 4).
 
 ## Environment Variables
 
-The following environment variables are automatically set by Vercel when you add KV storage:
+The following environment variables are required for the static configuration:
 
 ```bash
-KV_REST_API_URL=your_kv_rest_api_url
-KV_REST_API_TOKEN=your_kv_rest_api_token
-KV_REST_API_READ_ONLY_TOKEN=your_kv_rest_api_read_only_token
+REAL_URL=https://your-real-website.com
+BOT_URL=https://your-decoy-website.com
 ```
 
-**Note**: You don't need to manually set these. Vercel handles this automatically when you create a KV database.
+**Note**: These must be set in your Vercel project settings or `.env.local` file for local development.
 
 ## Usage Guide
 
-### Creating a Proxy
+### Using the Proxy
 
 1. Navigate to the **Admin Dashboard**: `https://your-app.vercel.app/admin`
 
-2. Enter your URLs:
-   - **Real Website URL**: Where legitimate users should go (e.g., `https://your-main-site.com`)
-   - **Bot Redirect URL**: Where bots should go (e.g., `https://decoy-site.com`)
+2. View your static configuration:
+   - **Real Website URL**: Where legitimate users will go
+   - **Bot Redirect URL**: Where bots will be redirected
 
-3. Click **Generate Proxy URL**
+3. Copy your deployment URL (e.g., `https://your-app.vercel.app`)
 
-4. Copy the generated proxy URL (e.g., `https://your-app.vercel.app/p/a3Kj9x2p`)
+4. **Important**: Share your deployment URL instead of your real website URL
 
-5. **Important**: Share this proxy URL instead of your real website URL
+5. The middleware will automatically redirect:
+   - **Legitimate users** → Real Website URL
+   - **Bots** → Bot Redirect URL
 
 ### How Bot Detection Works
 
@@ -228,73 +221,18 @@ The proxy preserves:
 
 **Example**:
 ```
-Proxy URL: https://your-app.vercel.app/p/abc123/products?id=5
-           ↓
-Real URL:  https://your-site.com/products?id=5
-```
-
-## API Documentation
-
-### POST /api/config
-
-Creates a new proxy configuration.
-
-**Request Body**:
-```json
-{
-  "realUrl": "https://your-main-site.com",
-  "botUrl": "https://decoy-site.com"
-}
-```
-
-**Response**:
-```json
-{
-  "success": true,
-  "proxyId": "a3Kj9x2p",
-  "proxyUrl": "https://your-app.vercel.app/p/a3Kj9x2p",
-  "config": {
-    "realUrl": "https://your-main-site.com",
-    "botUrl": "https://decoy-site.com",
-    "createdAt": 1699999999999
-  }
-}
-```
-
-### GET /api/config/[id]
-
-Retrieves a specific proxy configuration.
-
-**Example**: `GET /api/config/a3Kj9x2p`
-
-**Response**:
-```json
-{
-  "success": true,
-  "proxyId": "a3Kj9x2p",
-  "config": {
-    "realUrl": "https://your-main-site.com",
-    "botUrl": "https://decoy-site.com",
-    "createdAt": 1699999999999
-  }
-}
+Deployment URL: https://your-app.vercel.app/products?id=5
+                ↓
+Real URL:       https://your-site.com/products?id=5
 ```
 
 ## Architecture
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture and data flow diagrams.
 
-## Database Options
+## Configuration
 
-This project currently uses **Supabase** as its database, but we also provide a comprehensive guide for integrating **embedded databases** (like SQLite) for simpler deployments, local development, or edge use cases.
-
-📖 **[Embedded Database Integration Guide](./EMBEDDED_DATABASE_GUIDE.md)**
-
-Learn how to:
-- Set up SQLite with better-sqlite3 (zero configuration)
-- Migrate from Supabase to an embedded database
-- Use JSON-based databases (LowDB) for simple projects
-- Choose the right database for your deployment scenario
+This project uses **static configuration** via environment variables for a simple, single-user setup. No database is required - all configuration is stored in environment variables.
 
 ## Project Structure
 
@@ -302,15 +240,16 @@ Learn how to:
 vercel-bot-proxy/
 ├── middleware.ts              # Edge middleware (bot detection & routing)
 ├── lib/
-│   └── botDetection.ts        # Bot detection utilities
+│   ├── botDetection.ts        # Bot detection utilities
+│   └── supabase.ts            # (Legacy - not used in static config)
 ├── pages/
 │   ├── _app.tsx               # Next.js app wrapper
 │   ├── index.tsx              # Homepage
-│   ├── admin.tsx              # Admin dashboard
+│   ├── admin.tsx              # Admin dashboard (view static config)
 │   └── api/
-│       ├── config.ts          # POST /api/config
+│       ├── config.ts          # (Legacy - not used in static config)
 │       └── config/
-│           └── [id].ts        # GET /api/config/[id]
+│           └── [id].ts        # (Legacy - not used in static config)
 ├── styles/
 │   └── globals.css            # Global styles
 ├── package.json
@@ -329,9 +268,9 @@ vercel-bot-proxy/
 
 ## Security
 
-- **Proxy ID Generation**: Cryptographically secure using `nanoid`
-- **Collision Probability**: ~1 million years at 1000 IDs/hour
-- **No Data Logging**: Minimal data storage (only configuration URLs)
+- **Static Configuration**: Environment-based, no dynamic configuration
+- **No Database**: No data storage or user input processing
+- **No Data Logging**: Zero data storage beyond environment variables
 - **HTTPS Only**: All traffic encrypted
 
 ## Customization
@@ -362,34 +301,32 @@ To protect the admin dashboard, you can:
 
 ## Troubleshooting
 
-### Issue: "KV_REST_API_URL is not defined"
+### Issue: "REAL_URL is not defined"
 
-**Solution**: Make sure you've created a Vercel KV database and redeployed.
+**Solution**: Make sure you've set the environment variables in Vercel and redeployed.
 
 ```bash
-vercel env pull .env.local  # For local development
-vercel --prod                # Redeploy production
+# For local development, create .env.local with:
+REAL_URL=https://your-real-website.com
+BOT_URL=https://your-decoy-website.com
+
+# For production, set in Vercel Dashboard and redeploy:
+vercel --prod
 ```
 
 ### Issue: Middleware not running
 
-**Solution**: Ensure `middleware.ts` is in the root directory and the matcher is correct:
-
-```typescript
-export const config = {
-  matcher: '/p/:path*',
-};
-```
+**Solution**: Ensure `middleware.ts` is in the root directory and check the middleware configuration.
 
 ### Issue: Bot still reaching real site
 
 **Solution**:
 1. Check bot User-Agent in your server logs
-2. Add pattern to `lib/botDetection.ts`
+2. Add pattern to `middleware.ts` (detectTikTokBot function)
 3. Test locally with custom User-Agent:
 
 ```bash
-curl -H "User-Agent: TikTok Bot" https://your-app.vercel.app/p/your-id
+curl -H "User-Agent: TikTok Bot" https://your-app.vercel.app/
 ```
 
 ## Future Enhancements
