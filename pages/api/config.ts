@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { kv } from '@vercel/kv';
+import { supabase } from '../../lib/supabase';
 import { nanoid } from 'nanoid';
 
 /**
@@ -106,8 +106,18 @@ async function handlePost(
       createdAt: Date.now(),
     };
 
-    // Store in Vercel KV with pattern: proxy:{proxyId}
-    await kv.set(`proxy:${proxyId}`, config);
+    // Store in Supabase
+    const { error } = await supabase
+      .from('proxy_configs')
+      .insert({
+        id: proxyId,
+        real_url: config.realUrl,
+        bot_url: config.botUrl,
+      });
+
+    if (error) {
+      throw new Error(`Failed to store configuration: ${error.message}`);
+    }
 
     // Generate full proxy URL
     const proxyUrl = generateProxyUrl(proxyId, req);
