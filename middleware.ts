@@ -132,7 +132,130 @@ export async function middleware(request: NextRequest) {
     // Validate static configuration
     if (!REAL_URL || !BOT_URL) {
       console.error('Missing environment variables: REAL_URL and BOT_URL must be set');
-      return new NextResponse('Proxy service not configured', { status: 500 });
+
+      // Return helpful error page with instructions
+      const errorHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy Not Configured</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 { color: #333; margin-bottom: 16px; font-size: 28px; }
+        .icon { font-size: 48px; margin-bottom: 20px; }
+        p { color: #666; line-height: 1.6; margin-bottom: 24px; }
+        .steps {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .steps h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        .steps ol {
+            margin-left: 20px;
+        }
+        .steps li {
+            color: #555;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+            font-size: 14px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .warning strong {
+            color: #856404;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">⚠️</div>
+        <h1>Proxy Service Not Configured</h1>
+        <p>The proxy service requires environment variables to be configured before it can work.</p>
+
+        <div class="steps">
+            <h2>Setup Instructions:</h2>
+            <ol>
+                <li>Go to <a href="https://vercel.com/dashboard" target="_blank">Vercel Dashboard</a></li>
+                <li>Select your project</li>
+                <li>Navigate to <strong>Settings → Environment Variables</strong></li>
+                <li>Add the following variables:
+                    <ul style="margin: 8px 0 0 20px;">
+                        <li><code>REAL_URL</code> - Your real website URL (e.g., https://your-site.com)</li>
+                        <li><code>BOT_URL</code> - Your decoy website URL (e.g., https://decoy-site.com)</li>
+                    </ul>
+                </li>
+                <li>Set them for <strong>Production</strong>, <strong>Preview</strong>, and <strong>Development</strong></li>
+                <li>Trigger a new deployment (or push a commit to redeploy)</li>
+            </ol>
+        </div>
+
+        <div class="warning">
+            <strong>Arabic Instructions (تعليمات بالعربية):</strong><br>
+            زيد المتغيرات ديال البيئة في Vercel:<br>
+            <code>REAL_URL</code> (الموقع الحقيقي) و <code>BOT_URL</code> (الموقع المزيف للبوتات)<br>
+            شوف الملف <code>DEPLOYMENT_AR.md</code> للتفاصيل الكاملة.
+        </div>
+
+        <p style="margin-top: 24px; font-size: 14px; color: #999;">
+            Need help? Check the <code>README.md</code> or <code>DEPLOYMENT_AR.md</code> files in your repository.
+        </p>
+    </div>
+</body>
+</html>
+      `;
+
+      return new NextResponse(errorHtml, {
+        status: 500,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
     }
 
     // Run bot detection
