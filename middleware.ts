@@ -155,6 +155,7 @@ function buildRedirectUrl(baseUrl: string, request: NextRequest): string {
 
 /**
  * Main middleware function
+ * Implements a reverse proxy to serve content without redirecting
  */
 export async function middleware(request: NextRequest) {
   try {
@@ -290,20 +291,80 @@ export async function middleware(request: NextRequest) {
     // Run bot detection (TikTok, ChatGPT, and other AI bots)
     const isBot = detectBot(request);
 
-    // Build redirect URL with preserved path and query parameters
+    // Select target URL based on bot detection
     const targetUrl = isBot ? BOT_URL : REAL_URL;
-    const redirectUrl = buildRedirectUrl(targetUrl, request);
+    const proxyUrl = buildRedirectUrl(targetUrl, request);
 
-    // Perform redirect (302 = temporary redirect, appropriate for proxying)
-    // Using 302 instead of 301 to avoid browser caching
-    return NextResponse.redirect(redirectUrl, {
-      status: 302,
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-    });
+    // REVERSE PROXY: Fetch content from target URL and serve it directly
+    // This keeps the original URL in the browser while showing different content
+    try {
+      // Fetch the content from the target URL
+      const response = await fetch(proxyUrl, {
+        method: request.method,
+        headers: {
+          // Forward important headers but remove host-specific ones
+          'User-Agent': request.headers.get('user-agent') || 'Mozilla/5.0',
+          'Accept': request.headers.get('accept') || '*/*',
+          'Accept-Language': request.headers.get('accept-language') || 'en-US,en;q=0.9',
+          'Accept-Encoding': request.headers.get('accept-encoding') || 'gzip, deflate, br',
+          // Don't forward: host, connection, origin, referer (to avoid CORS issues)
+        },
+        // Forward body for POST/PUT requests
+        body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined,
+        // Don't follow redirects automatically (handle them ourselves if needed)
+        redirect: 'manual',
+      });
+
+      // Get the response body
+      const body = await response.text();
+
+      // Create response headers
+      const responseHeaders = new Headers();
+
+      // Copy relevant headers from the proxied response
+      const headersToForward = [
+        'content-type',
+        'content-language',
+        'cache-control',
+        'expires',
+        'last-modified',
+        'etag',
+      ];
+
+      headersToForward.forEach(header => {
+        const value = response.headers.get(header);
+        if (value) {
+          responseHeaders.set(header, value);
+        }
+      });
+
+      // Add our own headers to prevent caching
+      responseHeaders.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      responseHeaders.set('Pragma', 'no-cache');
+      responseHeaders.set('Expires', '0');
+
+      // Add a custom header to identify this as proxied content (for debugging)
+      responseHeaders.set('X-Proxy-Mode', isBot ? 'bot' : 'user');
+
+      // Return the proxied content with original URL preserved
+      return new NextResponse(body, {
+        status: response.status,
+        headers: responseHeaders,
+      });
+
+    } catch (fetchError) {
+      console.error('Proxy fetch error:', fetchError);
+
+      // Fallback to redirect if proxy fails
+      return NextResponse.redirect(proxyUrl, {
+        status: 302,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      });
+    }
 
   } catch (error) {
     console.error('Middleware error:', error);
