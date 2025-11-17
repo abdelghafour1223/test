@@ -284,6 +284,18 @@ Retrieves a specific proxy configuration.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture and data flow diagrams.
 
+## Database Options
+
+This project currently uses **Supabase** as its database, but we also provide a comprehensive guide for integrating **embedded databases** (like SQLite) for simpler deployments, local development, or edge use cases.
+
+📖 **[Embedded Database Integration Guide](./EMBEDDED_DATABASE_GUIDE.md)**
+
+Learn how to:
+- Set up SQLite with better-sqlite3 (zero configuration)
+- Migrate from Supabase to an embedded database
+- Use JSON-based databases (LowDB) for simple projects
+- Choose the right database for your deployment scenario
+
 ## Project Structure
 
 ```
