@@ -39,10 +39,16 @@ const TIKTOK_WEBVIEW_PATTERNS = [
 
 /**
  * TikTok Bot User-Agent patterns (ONLY these should be redirected)
+ * Includes case variations and common bot identifiers
  */
 const TIKTOK_BOT_PATTERNS = [
-  'Bytespider',      // AI data scraper
-  'TikTokSpider',    // Link preview fetcher
+  'Bytespider',      // AI data scraper (official capitalization)
+  'bytespider',      // Lowercase variant
+  'TikTokSpider',    // Link preview fetcher (official capitalization)
+  'tiktokspider',    // Lowercase variant
+  'ByteSpider',      // Alternative capitalization
+  'spider-feedback@bytedance.com',  // Email identifier in bot UA
+  'ttspider-feedback@tiktok.com',   // Email identifier in TikTokSpider UA
 ];
 
 /**
@@ -101,17 +107,16 @@ export async function middleware(request: NextRequest) {
     // Select target URL based on bot detection
     const targetUrl = isTikTokBot ? BOT_URL : REAL_URL;
 
-    // Log detection for debugging (only in development)
-    if (process.env.NODE_ENV === 'development') {
-      const userAgent = request.headers.get('user-agent') || 'unknown';
-      console.log('[TikTok Bot Detection - SSR]', {
-        isBot: isTikTokBot,
-        targetUrl: isTikTokBot ? 'FAKE URL (bot)' : 'REAL URL (human)',
-        userAgent: userAgent.substring(0, 100),
-        path: request.nextUrl.pathname,
-        method: 'REVERSE_PROXY',
-      });
-    }
+    // Log detection for debugging (always log in production for troubleshooting)
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+    console.log('[TikTok Bot Detection - SSR]', {
+      isBot: isTikTokBot,
+      targetUrl: isTikTokBot ? 'FAKE URL (bot)' : 'REAL URL (human)',
+      userAgent: userAgent,
+      path: request.nextUrl.pathname,
+      method: 'REVERSE_PROXY',
+      timestamp: new Date().toISOString(),
+    });
 
     // REVERSE PROXY: Fetch content from target URL and serve it directly
     // This keeps the original URL in the browser while showing different content
