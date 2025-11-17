@@ -11,15 +11,15 @@ export interface BotDetectionResult {
 
 /**
  * TikTok bot user-agent patterns
- * These are regularly updated patterns known to be used by TikTok's crawlers
+ * IMPORTANT: Only targets actual TikTok crawler bots (Bytespider and TikTokSpider)
+ * Does NOT include TikTok WebView patterns (trill, musical_ly, BytedanceWebview)
+ * as those represent legitimate human users browsing in TikTok's in-app browser
+ *
+ * Based on: Complete Technical Analysis: TikTok and ByteDance Crawlers (2025)
  */
 export const TIKTOK_BOT_PATTERNS = [
-  'tiktok',
-  'bytespider',
-  'bytedance',
-  'musically',
-  'musical_ly',
-  'trill',
+  'Bytespider',      // AI data scraper for LLM training
+  'TikTokSpider',    // Link preview fetcher
 ] as const;
 
 /**
@@ -68,21 +68,38 @@ export const GENERIC_BOT_PATTERNS = [
 ] as const;
 
 /**
- * TikTok domains to check in referer
+ * TikTok WebView identifiers (LEGITIMATE HUMAN TRAFFIC - DO NOT BLOCK)
+ * These patterns indicate real users browsing via TikTok's in-app browser
  */
-export const TIKTOK_DOMAINS = [
-  'tiktok.com',
-  'musical.ly',
-  'bytedance.com',
-  'douyin.com', // Chinese version of TikTok
+export const TIKTOK_WEBVIEW_PATTERNS = [
+  'trill',              // TikTok WebView identifier
+  'musical_ly',         // TikTok WebView identifier
+  'BytedanceWebview',   // TikTok WebView identifier
+  'JsSdk/1.0',          // TikTok WebView SDK
+  'JsSdk/2.0',          // TikTok WebView SDK
 ] as const;
 
 /**
+ * TikTok domains to check in referer (REMOVED - causes false positives)
+ * Referer-based detection blocks legitimate users clicking links from TikTok
+ */
+export const TIKTOK_DOMAINS = [] as const;
+
+/**
  * Checks if user-agent matches TikTok bot patterns
+ * Uses case-sensitive matching as official User-Agents use specific capitalization
  */
 export function isTikTokBotUserAgent(userAgent: string): boolean {
-  const ua = userAgent.toLowerCase();
-  return TIKTOK_BOT_PATTERNS.some(pattern => ua.includes(pattern));
+  // Case-sensitive matching for precise bot detection
+  return TIKTOK_BOT_PATTERNS.some(pattern => userAgent.includes(pattern));
+}
+
+/**
+ * Checks if user-agent is TikTok WebView (legitimate human user)
+ * These users should NOT be blocked or redirected to fake content
+ */
+export function isTikTokWebView(userAgent: string): boolean {
+  return TIKTOK_WEBVIEW_PATTERNS.some(pattern => userAgent.includes(pattern));
 }
 
 /**
@@ -140,22 +157,27 @@ export function detectBot(
   referer: string = '',
   headers?: { get: (name: string) => string | null }
 ): BotDetectionResult {
-  // High confidence: TikTok-specific detection
-  if (isTikTokBotUserAgent(userAgent)) {
+  // CRITICAL: Check if this is TikTok WebView (legitimate human user) FIRST
+  // WebView users must NOT be treated as bots
+  if (isTikTokWebView(userAgent)) {
     return {
-      isBot: true,
-      reason: 'TikTok bot user-agent detected',
+      isBot: false,
+      reason: 'TikTok WebView - legitimate human user',
       confidence: 'high',
     };
   }
 
-  if (isTikTokReferer(referer)) {
+  // High confidence: TikTok bot detection (Bytespider or TikTokSpider ONLY)
+  if (isTikTokBotUserAgent(userAgent)) {
     return {
       isBot: true,
-      reason: 'TikTok referer detected',
+      reason: 'TikTok bot user-agent detected (Bytespider or TikTokSpider)',
       confidence: 'high',
     };
   }
+
+  // Referer-based detection REMOVED - causes false positives
+  // Users clicking links from TikTok are legitimate human traffic
 
   // High confidence: ChatGPT and AI bot detection
   if (isChatGPTBotUserAgent(userAgent)) {
