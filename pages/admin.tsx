@@ -10,6 +10,7 @@ interface AdminProps {
 
 export default function AdminDashboard({ realUrl, botUrl, deploymentUrl }: AdminProps) {
   const [copied, setCopied] = useState(false);
+  const isConfigured = realUrl !== 'Not configured' && botUrl !== 'Not configured';
 
   const copyToClipboard = async () => {
     try {
@@ -44,14 +45,59 @@ export default function AdminDashboard({ realUrl, botUrl, deploymentUrl }: Admin
 
           {/* Configuration Display */}
           <div className="max-w-3xl mx-auto">
+            {/* Configuration Error Alert */}
+            {!isConfigured && (
+              <div className="bg-red-50 border-2 border-red-300 rounded-2xl shadow-xl p-6 md:p-8 mb-6 animate-slide-up">
+                <div className="flex items-start gap-4">
+                  <div className="text-4xl">🚨</div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-red-800 mb-3">
+                      Configuration Required!
+                    </h2>
+                    <p className="text-red-700 mb-4">
+                      Your proxy service is not configured yet. Environment variables are missing.
+                    </p>
+
+                    <div className="bg-white rounded-lg p-4 mb-4">
+                      <p className="font-semibold text-gray-800 mb-2">Quick Setup:</p>
+                      <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                        <li>Go to <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">Vercel Dashboard</a></li>
+                        <li>Select your project → Settings → Environment Variables</li>
+                        <li>Add <code className="bg-gray-100 px-2 py-0.5 rounded text-red-600">REAL_URL</code> and <code className="bg-gray-100 px-2 py-0.5 rounded text-red-600">BOT_URL</code></li>
+                        <li>Set for Production, Preview, and Development</li>
+                        <li>Redeploy your application</li>
+                      </ol>
+                    </div>
+
+                    <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                      <p className="text-sm font-semibold text-yellow-800 mb-1">
+                        🇲🇦 تعليمات بالدارجة المغربية:
+                      </p>
+                      <p className="text-sm text-yellow-700">
+                        شوف الملف <code className="bg-yellow-100 px-1 rounded">DEPLOYMENT_AR.md</code> للتعليمات الكاملة بالدارجة.
+                        خاصك تزيد <code className="bg-yellow-100 px-1 rounded">REAL_URL</code> و <code className="bg-yellow-100 px-1 rounded">BOT_URL</code> في Vercel.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 animate-slide-up space-y-6">
 
               {/* Status Badge */}
               <div className="flex items-center justify-center">
-                <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
-                  <span className="font-semibold">Active Configuration</span>
-                </div>
+                {isConfigured ? (
+                  <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                    <span className="font-semibold">Active Configuration</span>
+                  </div>
+                ) : (
+                  <div className="bg-red-100 text-red-800 px-4 py-2 rounded-full flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                    <span className="font-semibold">Configuration Missing</span>
+                  </div>
+                )}
               </div>
 
               {/* Proxy URL */}
@@ -96,28 +142,40 @@ export default function AdminDashboard({ realUrl, botUrl, deploymentUrl }: Admin
                 </h3>
 
                 {/* Real URL */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className={`rounded-lg p-4 ${realUrl === 'Not configured' ? 'bg-red-50 border-2 border-red-300' : 'bg-gray-50'}`}>
                   <label className="block text-sm font-medium text-gray-600 mb-2">
                     Real Website URL (Legitimate Users)
                   </label>
                   <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <code className="text-gray-800 break-all">{realUrl}</code>
+                    {realUrl === 'Not configured' ? (
+                      <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    )}
+                    <code className={`break-all ${realUrl === 'Not configured' ? 'text-red-800 font-semibold' : 'text-gray-800'}`}>{realUrl}</code>
                   </div>
                 </div>
 
                 {/* Bot URL */}
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className={`rounded-lg p-4 ${botUrl === 'Not configured' ? 'bg-red-50 border-2 border-red-300' : 'bg-gray-50'}`}>
                   <label className="block text-sm font-medium text-gray-600 mb-2">
                     Bot Redirect URL (Decoy Site)
                   </label>
                   <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <code className="text-gray-800 break-all">{botUrl}</code>
+                    {botUrl === 'Not configured' ? (
+                      <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                      </svg>
+                    )}
+                    <code className={`break-all ${botUrl === 'Not configured' ? 'text-red-800 font-semibold' : 'text-gray-800'}`}>{botUrl}</code>
                   </div>
                 </div>
               </div>

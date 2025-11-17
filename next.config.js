@@ -2,11 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // Enable Edge Runtime for middleware
-  experimental: {
-    runtime: 'edge',
-  },
-
   // Optimize for Vercel deployment
   compress: true,
 

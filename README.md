@@ -4,6 +4,9 @@
 
 A sophisticated Vercel-hosted application that acts as an intelligent proxy to protect your website from bot traffic (specifically TikTok bots) while maintaining a seamless experience for legitimate users.
 
+> 🇲🇦 **دليل النشر بالدارجة المغربية** متوفر في [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
+> **Arabic/Moroccan Darija deployment guide** available in [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md)
+
 ## Features
 
 - ⚡ **Ultra-Fast Detection**: Powered by Vercel Edge Functions (<50ms latency)
@@ -300,6 +303,27 @@ To protect the admin dashboard, you can:
    - Use NextAuth.js or similar
 
 ## Troubleshooting
+
+### Issue: "Proxy service not configured"
+
+**Symptom**: When you visit your deployed app, you see an error page saying "Proxy service not configured".
+
+**Cause**: Environment variables `REAL_URL` and `BOT_URL` are not set in Vercel.
+
+**Solution**:
+
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Select your project
+3. Navigate to **Settings** → **Environment Variables**
+4. Add both variables:
+   - `REAL_URL` = Your real website URL
+   - `BOT_URL` = Your decoy website URL
+5. Enable for **Production**, **Preview**, and **Development**
+6. **Redeploy** your application
+
+**Detailed instructions**:
+- English: See section "Deployment to Vercel" above
+- Arabic/Darija: See [DEPLOYMENT_AR.md](./DEPLOYMENT_AR.md) for full guide in Moroccan Arabic
 
 ### Issue: "REAL_URL is not defined"
 
